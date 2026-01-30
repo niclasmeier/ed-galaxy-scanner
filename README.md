@@ -44,6 +44,12 @@ Find the top 20 settlement candidates within 1000 LY of Sol:
 bunx settlement-planner --input galaxy.json
 ```
 
+The input file can also be gzip-compressed if the filename ends with `.gz`:
+
+```bash
+bunx settlement-planner --input galaxy.json.gz
+```
+
 Limit to systems within 500 LY of Sol:
 
 ```bash
@@ -164,6 +170,11 @@ bunx settlement-planner --input galaxy.json --verbose
 cat galaxy.json | bunx settlement-planner --input - > results.json
 ```
 
+**Gzip input** (transparent decompression for `.gz` files):
+```bash
+bunx settlement-planner --input galaxy.json.gz
+```
+
 ### 💡 Example Workflows
 
 **Find tritium sources between Sol and Colonia**:
@@ -213,6 +224,7 @@ This tool is designed to be published to npm for easy distribution. See the Rele
 - **Permission denied** → Run `chmod +x src/cli/index.ts`
 - **Invalid strategy** → Check spelling of `--scoring` or `--selection-strategy` values
 - **No results** → Try increasing `--max-dist-sol` or changing `--use-quadrants`
+- **Gzip error** → Ensure the file ends with `.gz` and is a valid gzip-compressed JSONL or JSON array
 
 ## Release Process
 

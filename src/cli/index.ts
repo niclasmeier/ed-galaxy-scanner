@@ -10,7 +10,7 @@ import { computeScore, shouldIncludeTritium, countIcyRings } from "../domain/sco
 import { parseSortSpec, validateSortSpec, applySortSpec, DEFAULT_SORT_SPEC } from "../domain/sorting.js";
 import { applySpaceSelection } from "../domain/selection.js";
 import type { SpaceSelectionStrategy, StarSystem, ScoringStrategyName } from "../domain/types.js";
-import { readJsonArrayStream, readJsonLines } from "../io/jsonl.js";
+import { detectJsonArrayInput, readJsonArrayStream, readJsonLines } from "../io/jsonl.js";
 import { formatCandidates, type OutputFormat } from "../io/output.js";
 import { distanceToSol } from "../utils/distance.js";
 import { isSystemInQuadrants, parseQuadrants, type QuadrantName } from "../utils/quadrant.js";
@@ -20,7 +20,7 @@ const program = new Command();
 program
   .name("settlement-ranking")
   .description("Rank settlement candidate systems from galaxy data")
-  .requiredOption("-i, --input <path>", "Input file path or '-' for stdin")
+  .requiredOption("-i, --input <path>", "Input file path (supports .gz) or '-' for stdin")
   .option("--max-dist-sol <number>", "Max distance to Sol in LY", "1000")
   .option(
     "--selection-strategy <mode>",
@@ -193,9 +193,8 @@ async function readSystems(
   if (!(await file.exists())) {
     throw new Error(`Input file not found: ${input}`);
   }
-  const peek = await file.slice(0, 2048).text();
-  const firstChar = peek.trim().charAt(0);
-  if (firstChar === "[") {
+  const isArray = await detectJsonArrayInput(input);
+  if (isArray) {
     const systems: StarSystem[] = [];
     for await (const record of readJsonArrayStream<StarSystem>(input, { continueOnError, onInvalid })) {
       reportRead();

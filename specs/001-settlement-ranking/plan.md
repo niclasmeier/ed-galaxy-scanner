@@ -9,6 +9,10 @@
 
 [Extract from feature spec: primary requirement + technical approach from research]
 
+Add transparent support for gzip-compressed input when the provided file name
+ends with `.gz`, using the same JSONL/JSON array parsing rules as uncompressed
+files.
+
 ## Technical Context
 
 <!--

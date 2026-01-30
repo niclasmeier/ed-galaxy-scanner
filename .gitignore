@@ -29,3 +29,5 @@ Thumbs.db
 #Source files
 galaxy*.gz
 galaxy*.json
+!tests/integration/fixtures/galaxy.fixture*.json
+!tests/integration/fixtures/galaxy.fixture*.json.gz

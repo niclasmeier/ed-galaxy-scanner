@@ -125,8 +125,11 @@ description: "Task list for Settlement Candidate Ranking CLI"
 - [x] T036 Filter Fleet Carriers from station lists early
 - [x] T037 [P] Add quadrant validation: reject invalid quadrant names with clear error messages
 - [x] T038 [P] Document --use-quadrants flag in help text with examples (NW, NE, SW, SE, all)
-- [ ] T039 [P] Add quadrant examples to quickstart.md
+- [x] T039 [P] Add quadrant examples to quickstart.md
 - [x] T040 [P] Test quadrant filtering with multi-quadrant queries (e.g., "SW,SE" or "all")
+- [x] T041 [P] Add gzip input support when filename ends with .gz
+- [x] T042 [P] Add tests for gzip input handling (valid gzip JSONL and JSON array)
+- [x] T043 [P] Document gzip input usage and error behavior in quickstart/help
 
 ---
 
