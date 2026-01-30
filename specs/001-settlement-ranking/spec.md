@@ -84,6 +84,7 @@ the breakdown matches the scoring rules.
 ### Edge Cases
 
 - What happens when the input file is missing or unreadable?
+- What happens when the input file ends with .gz but is not a valid gzip file?
 - How does the tool handle a line that is not valid JSON? It skips the line, logs a warning, and continues processing.
 - What happens when Sol is not present in the dataset?
 - How are ties handled when multiple systems share the same score?
@@ -141,6 +142,9 @@ the breakdown matches the scoring rules.
 
 - **FR-001**: The system MUST accept a file path input and process either line-delimited
   JSON objects (JSONL) or a single JSON array of star systems.
+- **FR-001a**: If the input file name ends with `.gz`, the system MUST transparently
+  decompress the file and parse it as JSONL or a JSON array using the same rules as
+  uncompressed input.
 - **FR-002**: The system MUST classify systems as populated when population $> 0$
   and empty when population $\le 0$.
 - **FR-003**: The system MUST allow a max distance to Sol parameter, defaulting
@@ -199,6 +203,7 @@ the breakdown matches the scoring rules.
 - Each system provides enough body metadata to count stars and planet types needed
   for scoring.
 - Distance is computed from 3D coordinates using straight-line distance.
+- If the input file ends with `.gz`, it is a valid gzip-compressed file.
 
 ## Algorithm Outline (authoritative)
 

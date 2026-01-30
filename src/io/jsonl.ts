@@ -5,11 +5,31 @@ export interface JsonReadOptions {
   onInvalid?: (index: number) => void;
 }
 
+function isGzipPath(input: string): boolean {
+  return input !== "-" && input.toLowerCase().endsWith(".gz");
+}
+
+function getInputStream(input: string): ReadableStream<Uint8Array> {
+  const stream = input === "-" ? Bun.stdin.stream() : Bun.file(input).stream();
+  if (isGzipPath(input)) {
+    return stream.pipeThrough(new DecompressionStream("gzip"));
+  }
+  return stream;
+}
+
+async function readInputText(input: string): Promise<string> {
+  if (input === "-") {
+    return Bun.stdin.text();
+  }
+  const stream = getInputStream(input);
+  return await new Response(stream).text();
+}
+
 export async function* readJsonLines<T>(
   input: string,
   options: JsonReadOptions,
 ): AsyncGenerator<ParsedRecord<T>> {
-  const stream = input === "-" ? Bun.stdin.stream() : Bun.file(input).stream();
+  const stream = getInputStream(input);
   const decoder = new TextDecoder();
   let buffer = "";
   let lineNumber = 0;
@@ -59,7 +79,7 @@ export async function* readJsonLines<T>(
 }
 
 export async function readJsonArray<T>(input: string): Promise<T[]> {
-  const text = await (input === "-" ? Bun.stdin.text() : Bun.file(input).text());
+  const text = await readInputText(input);
   const parsed = JSON.parse(text);
   if (!Array.isArray(parsed)) {
     throw new Error("Expected a JSON array input");
@@ -71,7 +91,7 @@ export async function* readJsonArrayStream<T>(
   input: string,
   options: JsonReadOptions,
 ): AsyncGenerator<ParsedRecord<T>> {
-  const stream = input === "-" ? Bun.stdin.stream() : Bun.file(input).stream();
+  const stream = getInputStream(input);
   const decoder = new TextDecoder();
   let buffer = "";
   let started = false;
@@ -198,7 +218,7 @@ export async function* readJsonArrayStream<T>(
 }
 
 export async function detectJsonArrayInput(input: string): Promise<boolean> {
-  const text = await (input === "-" ? Bun.stdin.text() : Bun.file(input).text());
+  const text = await readInputText(input);
   const trimmed = text.trim();
   if (trimmed.startsWith("[")) {
     return true;

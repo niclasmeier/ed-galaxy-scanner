@@ -16,6 +16,13 @@
 - JSONL (one system per line): `--input galaxy.jsonl`
 - JSON array (single list of systems): `--input galaxy_small.json`
 
+## Gzip input
+If the input file name ends with `.gz`, the CLI will transparently decompress it
+before parsing.
+
+- Gzip JSONL: `--input galaxy.jsonl.gz`
+- Gzip JSON array: `--input galaxy_small.json.gz`
+
 ## Stdin usage
 - `cat galaxy.jsonl | bun run src/cli/index.ts --input - --format json`
 
@@ -26,6 +33,11 @@ By default, the CLI filters to the South-West quadrant (SW) relative to Sagittar
 - Single quadrant: `--use-quadrants NE`
 - Multiple quadrants: `--use-quadrants NW,SE`
 - Valid quadrant names: NW (North-West), NE (North-East), SW (South-West), SE (South-East)
+
+Example: Default SW quadrant (includes Sol and Colonia):
+```
+bun run src/cli/index.ts --input galaxy.json --use-quadrants SW --format json
+```
 
 Example: Search across North-East and South-East quadrants:
 ```
