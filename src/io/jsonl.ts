@@ -17,6 +17,43 @@ function getInputStream(input: string): ReadableStream<Uint8Array> {
   return stream;
 }
 
+async function readInputPrefix(input: string, maxBytes: number): Promise<string | null> {
+  if (input === "-") {
+    return null;
+  }
+  const stream = getInputStream(input);
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+
+  try {
+    while (total < maxBytes) {
+      const { done, value } = await reader.read();
+      if (done || !value) {
+        break;
+      }
+      chunks.push(value);
+      total += value.byteLength;
+      if (total >= maxBytes) {
+        break;
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  if (chunks.length === 0) {
+    return "";
+  }
+  const buffer = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    buffer.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(buffer);
+}
+
 async function readInputText(input: string): Promise<string> {
   if (input === "-") {
     return Bun.stdin.text();
@@ -218,10 +255,10 @@ export async function* readJsonArrayStream<T>(
 }
 
 export async function detectJsonArrayInput(input: string): Promise<boolean> {
-  const text = await readInputText(input);
-  const trimmed = text.trim();
-  if (trimmed.startsWith("[")) {
-    return true;
+  const prefix = await readInputPrefix(input, 65536);
+  if (prefix === null) {
+    return false;
   }
-  return false;
+  const trimmed = prefix.trimStart();
+  return trimmed.startsWith("[");
 }
