@@ -1,0 +1,4 @@
+{"id64":1,"name":"Sol","coords":{"x":0,"y":0,"z":0},"population":1000,"bodies":[{"id64":10,"bodyId":0,"name":"Sol","type":"Star"}]}
+{"id64":2,"name":"Alpha","coords":{"x":20,"y":0,"z":0},"population":500,"bodies":[{"id64":11,"bodyId":0,"name":"Alpha","type":"Star"}]}
+{"id64":3,"name":"Beta","coords":{"x":10,"y":0,"z":0},"population":0,"bodies":[{"id64":12,"bodyId":0,"name":"Beta A","type":"Star"},{"id64":13,"bodyId":1,"name":"Beta 1","type":"Planet","subType":"Water World"}]}
+{"id64":4,"name":"Gamma","coords":{"x":100,"y":0,"z":0},"population":0,"bodies":[{"id64":14,"bodyId":0,"name":"Gamma A","type":"Star"},{"id64":15,"bodyId":1,"name":"Gamma 1","type":"Planet","subType":"Gas Giant"}]}

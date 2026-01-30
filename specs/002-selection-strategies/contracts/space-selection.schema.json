@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "space-selection.schema.json",
+  "title": "Space Selection Strategy",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "strategy": {
+      "type": "string",
+      "enum": ["sphere", "cube"],
+      "default": "sphere",
+      "description": "Selection strategy: spherical around Sol or cube bounded by endpoints."
+    },
+    "maxDistSol": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Max distance to Sol in LY (ignored when strategy=cube)."
+    },
+    "cubeFrom": {
+      "type": "string",
+      "description": "Cube endpoint system name (default: Sol when strategy=cube)."
+    },
+    "cubeTo": {
+      "type": "string",
+      "description": "Cube endpoint system name (default: Sol when strategy=cube)."
+    }
+  },
+  "required": ["strategy"],
+  "allOf": [
+    {
+      "if": { "properties": { "strategy": { "const": "cube" } } },
+      "then": {
+        "properties": {
+          "maxDistSol": {
+            "description": "Ignored for cube strategy."
+          }
+        }
+      }
+    }
+  ]
+}

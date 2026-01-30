@@ -1,0 +1,31 @@
+# Node/Bun
+node_modules/
+bun.lockb
+
+# Build output
+dist/
+build/
+coverage/
+
+# Env
+.env*
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.tmp
+*.swp
+
+# Editors
+.vscode/
+.idea/
+
+
+#Source files
+galaxy*.gz
+galaxy*.json

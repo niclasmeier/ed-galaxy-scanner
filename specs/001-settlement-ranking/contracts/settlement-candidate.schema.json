@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/contracts/settlement-candidate.schema.json",
+  "title": "SettlementCandidate",
+  "type": "object",
+  "required": ["name", "nearestPopulatedName", "distanceToSol", "totalScore", "scoreBreakdown"],
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "nearestPopulatedName": { "type": "string", "minLength": 1 },
+    "distanceToSol": { "type": "number", "minimum": 0 },
+    "totalScore": { "type": "number", "minimum": 0 },
+    "scoreBreakdown": {
+      "type": "object",
+      "required": [
+        "stars",
+        "neutronStars",
+        "planets",
+        "gasGiants",
+        "landable",
+        "waterWorlds",
+        "terraformable",
+        "highMetalContent"
+      ],
+      "properties": {
+        "stars": { "$ref": "#/$defs/scoreComponent" },
+        "neutronStars": { "$ref": "#/$defs/scoreComponent" },
+        "planets": { "$ref": "#/$defs/scoreComponent" },
+        "gasGiants": { "$ref": "#/$defs/scoreComponent" },
+        "landable": { "$ref": "#/$defs/scoreComponent" },
+        "waterWorlds": { "$ref": "#/$defs/scoreComponent" },
+        "terraformable": { "$ref": "#/$defs/scoreComponent" },
+        "highMetalContent": { "$ref": "#/$defs/scoreComponent" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "scoreComponent": {
+      "type": "object",
+      "required": ["count", "points"],
+      "properties": {
+        "count": { "type": "number", "minimum": 0 },
+        "points": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  }
+}
