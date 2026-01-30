@@ -1,0 +1,17 @@
+# Ignore dev/test artifacts
+specs/
+tests/
+.vscode/
+.idea/
+.ipynb_checkpoints/
+Untitled.ipynb
+
+# Ignore build/test caches
+coverage/
+*.log
+*.tmp
+*.swp
+
+# Ignore large data files
+galaxy*.json
+galaxy*.gz

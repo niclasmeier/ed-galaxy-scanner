@@ -1,15 +1,32 @@
 {
-  "name": "settlement-ranking-cli",
+  "name": "settlement-planner",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "description": "Elite Dangerous settlement ranking and analysis CLI",
+  "keywords": [
+    "elite-dangerous",
+    "settlement",
+    "ranking",
+    "cli"
+  ],
   "type": "module",
+  "bin": {
+    "settlement-planner": "./src/cli/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/niclasmeier/ed-galaxy-scanner.git"
+  },
+  "author": "Niclas Meier",
+  "license": "UNLICENSED",
   "scripts": {
     "start": "bun run src/cli/index.ts",
     "test": "bun test",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format": "prettier --check .",
-    "format:write": "prettier --write ."
+    "format:write": "prettier --write .",
+    "postinstall": "chmod +x src/cli/index.ts"
   },
   "dependencies": {
     "commander": "^12.1.0"

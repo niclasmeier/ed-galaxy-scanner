@@ -38,6 +38,7 @@ program
   .option("--format <format>", "Output format: json, text, or simple", "json")
   .option("--continue-on-error", "Skip invalid JSON lines and continue", true)
   .option("--verbose", "Enable verbose progress and summary output", false)
+  .addHelpText("after", "\nBunx usage: bunx settlement-planner [options]\n")
   .parse(process.argv);
 
 const options = program.opts();

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bunx Package Metadata",
+  "type": "object",
+  "required": ["name", "version", "description", "bin"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "npm package name (lowercase, hyphenated)"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$",
+      "description": "Semantic version"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "bin": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Command name → entry path"
+    },
+    "main": {
+      "type": "string",
+      "description": "Optional main entry point"
+    },
+    "scripts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}
