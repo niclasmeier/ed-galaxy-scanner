@@ -35,7 +35,7 @@ program
   .option("--scoring <strategy>", "Scoring strategy: industrial (default), agriculture, or tritium", "industrial")
   .option("--sort <spec>", "Sort criteria: field-direction[,field-direction...]. Fields: score, dsol. Directions: asc, desc. Examples: score-desc, score-asc, dsol-asc, score-desc,dsol-asc (default: score-desc,dsol-asc)", "score-desc,dsol-asc")
   .option("--limit <number>", "Max number of results to return", "20")
-  .option("--format <format>", "Output format: json, text, or simple", "json")
+  .option("--format <format>", "Output format: json, text, or simple", "simple")
   .option("--continue-on-error", "Skip invalid JSON lines and continue", true)
   .option("--verbose", "Enable verbose progress and summary output", false)
   .addHelpText("after", "\nBunx usage: bunx settlement-planner [options]\n")
