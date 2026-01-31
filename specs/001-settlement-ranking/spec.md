@@ -3,7 +3,7 @@
 **Feature Branch**: `001-settlement-ranking`  
 **Created**: 2026-01-29  
 **Status**: Draft  
-**Input**: User description: "Build a CLI tool to extract an ordered list of planets suitable for settlement in Elite Dangerous, using galaxy.json lines (name, coords, allegiance, population, stations). Start from populated systems, find colonizable systems within 15LY of previously settled systems, score systems by star/planet types (1 per star, 2 per neutron, 5 per planet, 4 per gas giant, 7 per landable, 8 per water world, 9 per terraformable, 10 per high metal content), ignore systems without planets, order by points, and accept parameters for input file and --max-dist-sol (default 1000LY). Support quadrant filtering based on galactic position relative to Sagittarius A* at (25.21875/-20.90625/25899.96875) with --use-quadrants flag."
+**Input**: User description: "Build a CLI tool to extract an ordered list of planets suitable for settlement in Elite Dangerous, using galaxy.json lines (name, coords, allegiance, population, stations). Start from populated systems, find colonizable systems within 15LY of previously settled systems, score systems by star/planet types (1 per star, 2 per neutron, 5 per planet, 4 per gas giant, 7 per landable, 8 per water world, 9 per terraformable, 10 per high metal content), ignore systems without planets, order by points, and accept a positional input file path and --max-dist-sol (default 1000LY). Support quadrant filtering based on galactic position relative to Sagittarius A* at (25.21875/-20.90625/25899.96875) with --use-quadrants flag."
 
 ## Clarifications
 
@@ -151,14 +151,10 @@ the breakdown matches the scoring rules.
 - **FR-001a**: If the input file name ends with `.gz`, the system MUST transparently
   decompress the file and parse it as a JSON array using the same rules as
   uncompressed input.
-- **FR-001b**: The system MUST use `stream-chain` + `stream-json` with a `chain()` pipeline to
-  parse JSON arrays while automatically handling gzip decompression. The pipeline MUST select
-  only the required fields (name, coords, population, allegiance, bodies, stations) using
-  `Pick`/`Ignore` (or `Filter` when preserving parent shape is required), and MUST ignore all
-  other fields. The implementation MUST NOT manually pull from a read stream; it MUST rely on
-  the `chain()` pipeline and `StreamArray` for a single top-level array. Stream events MUST be
-  used to build indexes and spatial buckets on-the-fly during the parse phase rather than
-  requiring a second pass.
+- **FR-001b**: The system MUST parse JSON arrays by buffering the full input (after optional
+  gzip decompression), splitting the top-level array into item strings, and parsing each item
+  with `JSON.parse`.
+  for this dataset. Field filtering is not required during parsing.
 - **FR-002**: The system MUST classify systems as populated when population $> 0$
   and empty when population $\le 0$.
 - **FR-003**: The system MUST allow a max distance to Sol parameter, defaulting
@@ -248,11 +244,9 @@ the breakdown matches the scoring rules.
 
 ## Algorithm Outline (authoritative)
 
-1. Read systems from JSON array input using `stream-chain` + `stream-json` with `chain()`,
-   automatically handling gzip decompression. Use `Pick`/`Ignore` (or `Filter` when needed)
-   to select only required fields (name, coords, population, allegiance, bodies, stations),
-   and stream items via `StreamArray` for the single top-level array. Do not manually pull
-   from read streams.
+1. Read systems from JSON array input by buffering the full file (decompress first if `.gz`),
+   splitting the top-level array into item strings, and parsing each item with `JSON.parse`.
+   Avoid `stream-chain`/`stream-json` due to performance; field filtering is not required.
 2. As each system is emitted from the stream:
    - Filter out systems beyond the max-distance-to-Sol threshold.
    - Classify as populated (population $> 0$) or empty (population $\le 0$).

@@ -9,7 +9,6 @@ describe("CLI verbose output", () => {
         "bun",
         "run",
         "src/cli/index.ts",
-        "--input",
         fixturePath,
         "--use-quadrants",
         "all",

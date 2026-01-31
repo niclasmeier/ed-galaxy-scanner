@@ -21,7 +21,7 @@ description: "Task list for Settlement Candidate Ranking CLI"
 - [x] T001 Create project structure per plan in src/ and tests/
 - [x] T002 Initialize Bun + TypeScript config with strict mode and add `commander` dependency
 - [x] T004 [P] Configure linting and formatting tools; enforce in CI or task runner
-- [x] T003 [P] Add basic CLI entry file stub in src/cli/index.ts with `--input`, `--max-dist-sol`, `--format`, `--continue-on-error`
+- [x] T003 [P] Add basic CLI entry file stub in src/cli/index.ts with positional input argument, `--max-dist-sol`, `--format`, `--continue-on-error`
 - [x] T003a [P] Add `--use-quadrants` CLI option with comma-separated quadrant names (NW, NE, SW, SE) or "all"; default SW
 
 ---
@@ -32,7 +32,7 @@ description: "Task list for Settlement Candidate Ranking CLI"
 - [x] T005a [P] Add quadrant constants (SAGITTARIUS_A, quadrant definitions) in src/domain/types.ts or dedicated quadrant utility
 - [x] T006 [P] Implement distance utility in src/utils/distance.ts (Euclidean distance, Sol distance)
 - [x] T006a [P] Implement quadrant determination utility in src/utils/quadrant.ts or src/domain/quadrant.ts
-- [x] T007 [P] Implement JSON array reader in src/io/jsonl.ts with streaming parsing and error handling
+- [x] T007 [P] Implement JSON array reader in src/io/json.ts with buffered parsing and error handling
 - [x] T007a [P] Extend JSON array reader to apply quadrant filtering during read (discard non-matching systems early)
 - [x] T009 Implement cube index in src/domain/settlement.ts (50 LY cube keys, on-demand cube creation, systems list, populated flag, and list of cubes with ≥1 system)
 - [x] T010 Implement output formatter in src/io/output.ts for JSON and text output
@@ -158,17 +158,17 @@ maintaining deterministic outputs and performance bounds.
   mark cubes reachable when they contain a star system within 150 LY of Sol,
   discard unreachable cubes
 - [x] T055 Track nearest populated system and deduplicate candidates deterministically
-- [x] T056 [P] Replace JSON parsing with `stream-chain` + `stream-json` using a `chain()` pipeline
-- [x] T057 [P] Implement field selection with `Pick`/`Ignore` (or `Filter` when needed) to extract only required fields (name, coords, population, allegiance, bodies, stations)
-- [x] T058 [P] Implement event-driven indexing: build spatial buckets and indexes directly from stream events during parsing
-- [x] T059 [P] Add tests for stream-chain + stream-json parsing with gzip input and field selection
+- [x] T056 [P] Replace JSON parsing with buffered parsing (split array items + `JSON.parse`) with gzip support
+- [x] T057 [P] Confirm buffered parsing does not require field filtering
+- [x] T058 [P] Implement event-driven indexing: build spatial buckets and indexes directly from parse events
+- [x] T059 [P] Add tests for buffered parsing with gzip input
 
-## Todo List (Stream-Chain Migration)
+## Todo List (Buffered Parsing Migration)
 
-- [x] Update JSON array reader to use `chain()` pipeline with `parser()` and `StreamArray`
-- [x] Add `Pick`/`Ignore` filter stage to drop unused fields early
-- [x] Ensure no manual read-stream pulling in parsing implementation
-- [x] Add/adjust integration tests for gzip input with field selection
+- [x] Update JSON array reader to buffered parsing (split array items + `JSON.parse`)
+- [x] Confirm no field filtering requirement during parsing
+- [x] Ensure no streaming parser is used
+- [x] Add/adjust integration tests for gzip input
 
 ## Dependencies & Execution Order
 

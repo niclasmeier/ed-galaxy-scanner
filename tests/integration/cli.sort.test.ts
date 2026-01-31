@@ -26,7 +26,7 @@ describe("CLI sort flag", () => {
 
   describe("default sort behavior", () => {
     it("should use score-desc,dsol-asc as default", () => {
-      const output = runCli([`--input ${input}`, "--limit 5", "--format json"]);
+      const output = runCli([`${input}`, "--limit 5", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ name: string; totalScore: number; distanceToSol: number }>;
 
       // Fixture only has 1 candidate, so just verify we get results
@@ -38,7 +38,7 @@ describe("CLI sort flag", () => {
 
   describe("single sort criterion", () => {
     it("should accept score-desc", () => {
-      const output = runCli([`--input ${input}`, "--sort score-desc", "--limit 5", "--format json"]);
+      const output = runCli([`${input}`, "--sort score-desc", "--limit 5", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ totalScore: number }>;
 
       for (let i = 0; i < results.length - 1; i++) {
@@ -47,7 +47,7 @@ describe("CLI sort flag", () => {
     });
 
     it("should accept score-asc", () => {
-      const output = runCli([`--input ${input}`, "--sort score-asc", "--limit 5", "--format json"]);
+      const output = runCli([`${input}`, "--sort score-asc", "--limit 5", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ totalScore: number }>;
 
       for (let i = 0; i < results.length - 1; i++) {
@@ -56,7 +56,7 @@ describe("CLI sort flag", () => {
     });
 
     it("should accept dsol-asc", () => {
-      const output = runCli([`--input ${input}`, "--sort dsol-asc", "--limit 5", "--format json"]);
+      const output = runCli([`${input}`, "--sort dsol-asc", "--limit 5", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ distanceToSol: number }>;
 
       for (let i = 0; i < results.length - 1; i++) {
@@ -65,7 +65,7 @@ describe("CLI sort flag", () => {
     });
 
     it("should accept dsol-desc", () => {
-      const output = runCli([`--input ${input}`, "--sort dsol-desc", "--limit 5", "--format json"]);
+      const output = runCli([`${input}`, "--sort dsol-desc", "--limit 5", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ distanceToSol: number }>;
 
       for (let i = 0; i < results.length - 1; i++) {
@@ -76,7 +76,7 @@ describe("CLI sort flag", () => {
 
   describe("default directions for fields", () => {
     it("should use desc as default for score", () => {
-      const output = runCli([`--input ${input}`, "--sort score", "--limit 5", "--format json"]);
+      const output = runCli([`${input}`, "--sort score", "--limit 5", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ totalScore: number }>;
 
       // Fixture only has 1 candidate, verify we get a result
@@ -85,7 +85,7 @@ describe("CLI sort flag", () => {
     });
 
     it("should use asc as default for dsol", () => {
-      const output = runCli([`--input ${input}`, "--sort dsol", "--limit 5", "--format json"]);
+      const output = runCli([`${input}`, "--sort dsol", "--limit 5", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ distanceToSol: number }>;
 
       // Fixture only has 1 candidate, verify we get a result
@@ -96,7 +96,7 @@ describe("CLI sort flag", () => {
 
   describe("multiple sort criteria", () => {
     it("should apply multi-level sort with score-desc,dsol-asc", () => {
-      const output = runCli([`--input ${input}`, "--sort score-desc,dsol-asc", "--limit 20", "--format json"]);
+      const output = runCli([`${input}`, "--sort score-desc,dsol-asc", "--limit 20", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ totalScore: number; distanceToSol: number }>;
 
       // First level: score descending
@@ -115,7 +115,7 @@ describe("CLI sort flag", () => {
     });
 
     it("should apply multi-level sort with dsol-asc,score-desc", () => {
-      const output = runCli([`--input ${input}`, "--sort dsol-asc,score-desc", "--limit 20", "--format json"]);
+      const output = runCli([`${input}`, "--sort dsol-asc,score-desc", "--limit 20", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ totalScore: number; distanceToSol: number }>;
 
       // First level: dsol ascending
@@ -136,8 +136,8 @@ describe("CLI sort flag", () => {
 
   describe("case-insensitive parsing", () => {
     it("should handle uppercase fields and directions", () => {
-      const output1 = runCli([`--input ${input}`, "--sort SCORE-DESC", "--limit 5", "--format json"]);
-      const output2 = runCli([`--input ${input}`, "--sort score-desc", "--limit 5", "--format json"]);
+      const output1 = runCli([`${input}`, "--sort SCORE-DESC", "--limit 5", "--format json"]);
+      const output2 = runCli([`${input}`, "--sort score-desc", "--limit 5", "--format json"]);
 
       const results1 = parseJsonOutput(output1) as Array<{ name: string }>;
       const results2 = parseJsonOutput(output2) as Array<{ name: string }>;
@@ -147,7 +147,7 @@ describe("CLI sort flag", () => {
     });
 
     it("should handle mixed case", () => {
-      const output = runCli([`--input ${input}`, "--sort", "Score-Desc,Dsol-Asc", "--limit 5", "--format json"]);
+      const output = runCli([`${input}`, "--sort", "Score-Desc,Dsol-Asc", "--limit 5", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ totalScore: number }>;
 
       expect(results).toBeDefined();
@@ -157,14 +157,14 @@ describe("CLI sort flag", () => {
 
   describe("whitespace handling", () => {
     it("should handle spaces around hyphens", () => {
-      const output = runCli([`--input ${input}`, `--sort "score - desc"`, "--limit 5", "--format json"]);
+      const output = runCli([`${input}`, `--sort "score - desc"`, "--limit 5", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ totalScore: number }>;
 
       expect(results.length).toBeGreaterThan(0);
     });
 
     it("should handle spaces around commas", () => {
-      const output = runCli([`--input ${input}`, `--sort "score-desc , dsol-asc"`, "--limit 5", "--format json"]);
+      const output = runCli([`${input}`, `--sort "score-desc , dsol-asc"`, "--limit 5", "--format json"]);
       const results = parseJsonOutput(output) as Array<{ totalScore: number }>;
 
       expect(results.length).toBeGreaterThan(0);
@@ -173,21 +173,21 @@ describe("CLI sort flag", () => {
 
   describe("error handling", () => {
     it("should reject invalid field", () => {
-      const command = `bun run ${path.join(projectRoot, "src/cli/index.ts")} --input ${input} --sort invalid-desc`;
+      const command = `bun run ${path.join(projectRoot, "src/cli/index.ts")} ${input} --sort invalid-desc`;
       expect(() => {
         execSync(command, { cwd: projectRoot, encoding: "utf8" });
       }).toThrow();
     });
 
     it("should reject invalid direction", () => {
-      const command = `bun run ${path.join(projectRoot, "src/cli/index.ts")} --input ${input} --sort score-invalid`;
+      const command = `bun run ${path.join(projectRoot, "src/cli/index.ts")} ${input} --sort score-invalid`;
       expect(() => {
         execSync(command, { cwd: projectRoot, encoding: "utf8" });
       }).toThrow();
     });
 
     it("should reject duplicate fields", () => {
-      const command = `bun run ${path.join(projectRoot, "src/cli/index.ts")} --input ${input} --sort score-desc,score-asc`;
+      const command = `bun run ${path.join(projectRoot, "src/cli/index.ts")} ${input} --sort score-desc,score-asc`;
       expect(() => {
         execSync(command, { cwd: projectRoot, encoding: "utf8" });
       }).toThrow();
@@ -197,7 +197,7 @@ describe("CLI sort flag", () => {
   describe("with other flags", () => {
     it("should work with --scoring tritium", () => {
       const output = runCli([
-        `--input ${input}`,
+        `${input}`,
         "--sort score-desc,dsol-asc",
         "--scoring tritium",
         "--limit 5",
@@ -210,7 +210,7 @@ describe("CLI sort flag", () => {
     });
 
     it("should work with --format simple", () => {
-      const output = runCli([`--input ${input}`, "--sort score-desc,dsol-asc", "--limit 5", "--format simple"]);
+      const output = runCli([`${input}`, "--sort score-desc,dsol-asc", "--limit 5", "--format simple"]);
 
       // Should contain table header
       expect(output).toContain("name");
@@ -218,14 +218,14 @@ describe("CLI sort flag", () => {
     });
 
     it("should work with --format text", () => {
-      const output = runCli([`--input ${input}`, "--sort score-desc,dsol-asc", "--limit 5", "--format text"]);
+      const output = runCli([`${input}`, "--sort score-desc,dsol-asc", "--limit 5", "--format text"]);
 
       expect(output.length).toBeGreaterThan(0);
     });
 
     it("should work with --max-dist-sol filter", () => {
       const output = runCli([
-        `--input ${input}`,
+        `${input}`,
         "--sort score-desc,dsol-asc",
         "--max-dist-sol 50",
         "--limit 5",
@@ -240,8 +240,8 @@ describe("CLI sort flag", () => {
 
   describe("result ordering consistency", () => {
     it("should produce consistent results across multiple runs", () => {
-      const output1 = runCli([`--input ${input}`, "--sort score-desc,dsol-asc", "--limit 10", "--format json"]);
-      const output2 = runCli([`--input ${input}`, "--sort score-desc,dsol-asc", "--limit 10", "--format json"]);
+      const output1 = runCli([`${input}`, "--sort score-desc,dsol-asc", "--limit 10", "--format json"]);
+      const output2 = runCli([`${input}`, "--sort score-desc,dsol-asc", "--limit 10", "--format json"]);
 
       const results1 = parseJsonOutput(output1) as Array<{ name: string }>;
       const results2 = parseJsonOutput(output2) as Array<{ name: string }>;
@@ -250,8 +250,8 @@ describe("CLI sort flag", () => {
     });
 
     it("should maintain order when changing only sort criteria", () => {
-      const output1 = runCli([`--input ${input}`, "--sort score-desc", "--limit 10", "--format json"]);
-      const output2 = runCli([`--input ${input}`, "--sort score-desc,dsol-asc", "--limit 10", "--format json"]);
+      const output1 = runCli([`${input}`, "--sort score-desc", "--limit 10", "--format json"]);
+      const output2 = runCli([`${input}`, "--sort score-desc,dsol-asc", "--limit 10", "--format json"]);
 
       const results1 = parseJsonOutput(output1) as Array<{ name: string; totalScore: number }>;
       const results2 = parseJsonOutput(output2) as Array<{ name: string; totalScore: number }>;

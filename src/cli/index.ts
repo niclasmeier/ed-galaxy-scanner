@@ -16,7 +16,7 @@ const program = new Command();
 program
   .name("settlement-ranking")
   .description("Rank settlement candidate systems from galaxy data")
-  .requiredOption("-i, --input <path>", "Input file path (supports .gz) or '-' for stdin")
+  .argument("<input>", "Input file path (supports .gz) or '-' for stdin")
   .option("--max-dist-sol <number>", "Max distance to Sol in LY", "1000")
   .option(
     "--selection-strategy <mode>",
@@ -36,7 +36,7 @@ program
   .option("--verbose", "Enable verbose progress and summary output", false)
   .option("--colonization-mode <mode>", "Colonization eligibility mode: standard or none (default: standard)", "standard")
   .option("--require-sol-route", "Require systems to be in cubes with systems within 150 LY of Sol", false)
-  .addHelpText("after", "\nBunx usage: bunx settlement-planner [options]\n")
+  .addHelpText("after", "\nBunx usage: bunx settlement-planner <input> [options]\n")
   .parse(process.argv);
 
 const options = program.opts();
@@ -274,9 +274,9 @@ async function readSystems(
 
 async function main(): Promise<void> {
   try {
-    const input = String(options.input ?? "");
+    const input = program.args[0];
     if (!input) {
-      throw new Error("Missing --input");
+      throw new Error("Missing input path");
     }
     const selectionStrategyRaw = String(options.selectionStrategy ?? "sphere").toLowerCase();
     if (selectionStrategyRaw !== "sphere" && selectionStrategyRaw !== "cube" && selectionStrategyRaw !== "area") {

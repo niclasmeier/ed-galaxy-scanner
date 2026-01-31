@@ -22,13 +22,11 @@ system within 150 LY of Sol, (3) discarding unreachable cubes from iteration, an
 Tune spatial indexing to the 15 LY eligibility radius (bucket size = 15 LY)
 and ensure deterministic nearest-populated tracking with candidate deduplication.
 
-Use `stream-chain` + `stream-json` with a `chain()` pipeline for efficient streaming JSON parsing
-that automatically handles gzip-compressed files. Implement field selection with `Pick`/`Ignore`
-(or `Filter` when preserving parent shape is required) to extract only required fields
-(name, coords, population, allegiance, bodies, stations) and ignore all others. Use
-`StreamArray` for the single top-level array and avoid manual read-stream pulling. Drive
-spatial indexing and bucket creation directly from stream events during parsing, eliminating
-the need for a separate indexing pass.
+Parse JSON arrays with a buffered approach: read and optionally gzip-decompress the full file,
+split the top-level array into item strings, and `JSON.parse` each item. This replaces the
+`stream-chain`/`stream-json` pipeline because it is too slow for this dataset. Field filtering
+is not required during parsing. Drive spatial indexing and bucket creation directly from parse
+events, eliminating the need for a separate indexing pass.
 
 Add transparent support for gzip-compressed input when the provided file name
 ends with `.gz`, using the same JSON array parsing rules as uncompressed files.
