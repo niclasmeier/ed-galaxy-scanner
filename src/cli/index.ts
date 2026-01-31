@@ -6,7 +6,7 @@ import { computeScore, shouldIncludeTritium, countIcyRings } from "../domain/sco
 import { parseSortSpec, validateSortSpec, applySortSpec, DEFAULT_SORT_SPEC } from "../domain/sorting.js";
 import { applySpaceSelection } from "../domain/selection.js";
 import type { SpaceSelectionStrategy, StarSystem, ScoringStrategyName } from "../domain/types.js";
-import { detectJsonArrayInput, readJsonArrayStream } from "../io/jsonl.js";
+import { detectJsonArrayInput, readJsonArrayStream } from "../io/json.js";
 import { formatCandidates, type OutputFormat } from "../io/output.js";
 import { distanceToSol } from "../utils/distance.js";
 import { isSystemInQuadrants, parseQuadrants, type QuadrantName } from "../utils/quadrant.js";

@@ -26,3 +26,28 @@ declare module "stream-json/streamers/StreamArray.js" {
 
   export { streamArray };
 }
+
+declare module "stream-json/filters/Filter.js" {
+  import { Transform } from "stream";
+
+  interface FilterOptions {
+    filter?: (stack: Array<string | number | null>, chunk?: unknown) => boolean;
+    pathSeparator?: string;
+    replacement?: unknown;
+    allowEmptyReplacement?: boolean;
+    streamValues?: boolean;
+    streamKeys?: boolean;
+    once?: boolean;
+  }
+
+  interface Filter extends Transform {
+    on(event: string, listener: (...args: unknown[]) => void): this;
+  }
+
+  interface FilterConstructor {
+    filter(options?: FilterOptions): Filter;
+  }
+
+  const Filter: FilterConstructor;
+  export default Filter;
+}

@@ -158,10 +158,17 @@ maintaining deterministic outputs and performance bounds.
   mark cubes reachable when they contain a star system within 150 LY of Sol,
   discard unreachable cubes
 - [x] T055 Track nearest populated system and deduplicate candidates deterministically
-- [ ] T056 [P] Replace JSON parsing with `stream-json` library using `chain()` function for efficient streaming
-- [ ] T057 [P] Implement field selection in stream-json chain to extract only required fields (name, coords, population, allegiance, bodies, stations)
-- [ ] T058 [P] Implement event-driven indexing: build spatial buckets and indexes directly from stream events during parsing
-- [ ] T059 [P] Add tests for stream-json parsing with gzip input and field selection
+- [x] T056 [P] Replace JSON parsing with `stream-chain` + `stream-json` using a `chain()` pipeline
+- [x] T057 [P] Implement field selection with `Pick`/`Ignore` (or `Filter` when needed) to extract only required fields (name, coords, population, allegiance, bodies, stations)
+- [x] T058 [P] Implement event-driven indexing: build spatial buckets and indexes directly from stream events during parsing
+- [x] T059 [P] Add tests for stream-chain + stream-json parsing with gzip input and field selection
+
+## Todo List (Stream-Chain Migration)
+
+- [x] Update JSON array reader to use `chain()` pipeline with `parser()` and `StreamArray`
+- [x] Add `Pick`/`Ignore` filter stage to drop unused fields early
+- [x] Ensure no manual read-stream pulling in parsing implementation
+- [x] Add/adjust integration tests for gzip input with field selection
 
 ## Dependencies & Execution Order
 

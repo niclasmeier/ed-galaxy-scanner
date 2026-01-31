@@ -151,11 +151,14 @@ the breakdown matches the scoring rules.
 - **FR-001a**: If the input file name ends with `.gz`, the system MUST transparently
   decompress the file and parse it as a JSON array using the same rules as
   uncompressed input.
-- **FR-001b**: The system MUST use the `stream-json` library with `chain()` function to efficiently
-  parse JSON arrays while automatically handling gzip decompression. During streaming, the parser
-  MUST select only the required fields (name, coords, population, allegiance, bodies, stations)
-  to minimize memory usage. Stream events MUST be used to build indexes and spatial buckets
-  on-the-fly during the parse phase rather than requiring a second pass.
+- **FR-001b**: The system MUST use `stream-chain` + `stream-json` with a `chain()` pipeline to
+  parse JSON arrays while automatically handling gzip decompression. The pipeline MUST select
+  only the required fields (name, coords, population, allegiance, bodies, stations) using
+  `Pick`/`Ignore` (or `Filter` when preserving parent shape is required), and MUST ignore all
+  other fields. The implementation MUST NOT manually pull from a read stream; it MUST rely on
+  the `chain()` pipeline and `StreamArray` for a single top-level array. Stream events MUST be
+  used to build indexes and spatial buckets on-the-fly during the parse phase rather than
+  requiring a second pass.
 - **FR-002**: The system MUST classify systems as populated when population $> 0$
   and empty when population $\le 0$.
 - **FR-003**: The system MUST allow a max distance to Sol parameter, defaulting
@@ -245,9 +248,11 @@ the breakdown matches the scoring rules.
 
 ## Algorithm Outline (authoritative)
 
-1. Read systems from JSON array input using `stream-json` with `chain()` function,
-   automatically handling gzip decompression. Select only required fields during streaming
-   (name, coords, population, allegiance, bodies, stations).
+1. Read systems from JSON array input using `stream-chain` + `stream-json` with `chain()`,
+   automatically handling gzip decompression. Use `Pick`/`Ignore` (or `Filter` when needed)
+   to select only required fields (name, coords, population, allegiance, bodies, stations),
+   and stream items via `StreamArray` for the single top-level array. Do not manually pull
+   from read streams.
 2. As each system is emitted from the stream:
    - Filter out systems beyond the max-distance-to-Sol threshold.
    - Classify as populated (population $> 0$) or empty (population $\le 0$).
