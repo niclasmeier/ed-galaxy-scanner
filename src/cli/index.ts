@@ -139,6 +139,12 @@ interface ReadStats {
   readCount: number;
   skippedQuadrants: number;
   filteredNoIce: number;
+  populatedCount: number;
+  emptyCount: number;
+}
+
+function formatCount(value: number): string {
+  return value.toLocaleString("en-US");
 }
 
 async function readSystems(
@@ -148,12 +154,32 @@ async function readSystems(
   quadrants?: Set<QuadrantName>,
   scoringStrategy?: ScoringStrategyName,
 ): Promise<{ systems: StarSystem[]; stats: ReadStats }> {
-  const stats: ReadStats = { brokenLines: 0, readCount: 0, skippedQuadrants: 0, filteredNoIce: 0 };
+  const stats: ReadStats = {
+    brokenLines: 0,
+    readCount: 0,
+    skippedQuadrants: 0,
+    filteredNoIce: 0,
+    populatedCount: 0,
+    emptyCount: 0,
+  };
+  let lastLineLength = 0;
+  const writeLiveStats = (): void => {
+    if (!verbose) {
+      return;
+    }
+    const discardedOther = stats.filteredNoIce + stats.brokenLines;
+    const line =
+      `Reading systems=${formatCount(stats.readCount)} ` +
+      `populated=${formatCount(stats.populatedCount)} ` +
+      `discarded_quadrants=${formatCount(stats.skippedQuadrants)} ` +
+      `discarded_other=${formatCount(discardedOther)}`;
+    const padded = line.padEnd(lastLineLength, " ");
+    process.stderr.write(`\r${padded}`);
+    lastLineLength = Math.max(lastLineLength, line.length);
+  };
   const reportRead = (): void => {
     stats.readCount += 1;
-    if (verbose && stats.readCount % 10000 === 0) {
-      process.stderr.write(".");
-    }
+    writeLiveStats();
   };
   const onInvalid = (index: number): void => {
     stats.brokenLines += 1;
@@ -161,7 +187,7 @@ async function readSystems(
   };
 
   if (verbose) {
-    process.stderr.write("Reading ");
+    writeLiveStats();
   }
   if (input === "-") {
     const systems: StarSystem[] = [];
@@ -171,18 +197,27 @@ async function readSystems(
       if (normalized) {
         if (quadrants && !isSystemInQuadrants(normalized.coords, quadrants)) {
           stats.skippedQuadrants += 1;
+          writeLiveStats();
           continue;
         }
         // Apply tritium filtering during read phase for memory efficiency
         if (scoringStrategy === "tritium" && !shouldIncludeTritium(normalized)) {
           stats.filteredNoIce += 1;
+          writeLiveStats();
           continue;
         }
+        if (normalized.population > 0) {
+          stats.populatedCount += 1;
+        } else {
+          stats.emptyCount += 1;
+        }
+        writeLiveStats();
         systems.push(stripFleetCarriers(normalized));
       } else if (!continueOnError) {
         throw new Error(`Invalid system record on line ${record.lineNumber ?? 0}`);
       } else {
         stats.brokenLines += 1;
+        writeLiveStats();
         console.error(`Warning: invalid system record on line ${record.lineNumber ?? 0}, skipping.`);
       }
     }
@@ -202,18 +237,27 @@ async function readSystems(
       if (normalized) {
         if (quadrants && !isSystemInQuadrants(normalized.coords, quadrants)) {
           stats.skippedQuadrants += 1;
+          writeLiveStats();
           continue;
         }
         // Apply tritium filtering during read phase for memory efficiency
         if (scoringStrategy === "tritium" && !shouldIncludeTritium(normalized)) {
           stats.filteredNoIce += 1;
+          writeLiveStats();
           continue;
         }
+        if (normalized.population > 0) {
+          stats.populatedCount += 1;
+        } else {
+          stats.emptyCount += 1;
+        }
+        writeLiveStats();
         systems.push(stripFleetCarriers(normalized));
       } else if (!continueOnError) {
         throw new Error(`Invalid system record in JSON array at index ${record.lineNumber ?? 0}`);
       } else {
         stats.brokenLines += 1;
+        writeLiveStats();
         console.error(
           `Warning: invalid system record in JSON array at index ${record.lineNumber ?? 0}, skipping.`,
         );
@@ -229,18 +273,27 @@ async function readSystems(
     if (normalized) {
       if (quadrants && !isSystemInQuadrants(normalized.coords, quadrants)) {
         stats.skippedQuadrants += 1;
+        writeLiveStats();
         continue;
       }
       // Apply tritium filtering during read phase for memory efficiency
       if (scoringStrategy === "tritium" && !shouldIncludeTritium(normalized)) {
         stats.filteredNoIce += 1;
+        writeLiveStats();
         continue;
       }
+      if (normalized.population > 0) {
+        stats.populatedCount += 1;
+      } else {
+        stats.emptyCount += 1;
+      }
+      writeLiveStats();
       systems.push(stripFleetCarriers(normalized));
     } else if (!continueOnError) {
       throw new Error(`Invalid system record on line ${record.lineNumber ?? 0}`);
     } else {
       stats.brokenLines += 1;
+      writeLiveStats();
       console.error(`Warning: invalid system record on line ${record.lineNumber ?? 0}, skipping.`);
     }
   }

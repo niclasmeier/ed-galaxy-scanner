@@ -130,6 +130,10 @@ description: "Task list for Settlement Candidate Ranking CLI"
 - [x] T041 [P] Add gzip input support when filename ends with .gz
 - [x] T042 [P] Add tests for gzip input handling (valid gzip JSONL and JSON array)
 - [x] T043 [P] Document gzip input usage and error behavior in quickstart/help
+- [x] T044 [P] Update verbose output to show live read stats (systems read, populated, quadrant-discarded, other filters) instead of dots
+- [x] T045 [P] Add tests for verbose live stats output formatting
+- [x] T046 [P] Format verbose live stats counts with thousands separators
+- [x] T047 [P] Add tests for thousands separator formatting in verbose stats
 
 ---
 

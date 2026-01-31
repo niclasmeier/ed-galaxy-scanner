@@ -172,9 +172,11 @@ the breakdown matches the scoring rules.
 - **FR-010b**: The system MUST support a `--limit` parameter that caps the
   number of returned results, defaulting to 20.
 - **FR-010c**: The system MUST support a `--verbose` flag that prints "Reading "
-  followed by a dot for every 10,000 systems read, and prints a summary after
-  reading with broken lines, empty systems, populated systems, quadrants, and
-  total result count.
+  followed by a continuously updated inline stats readout (systems read, populated
+  systems, discarded by quadrants, and discarded by other filters such as tritium).
+  The CLI MUST still print a summary after reading with broken lines, empty systems,
+  populated systems, quadrants, and total result count.
+- **FR-010c1**: Live verbose statistics MUST format counts with a thousands separator.
 - **FR-010d**: The system MUST remove Fleet Carriers from station lists early
   and exclude them from station counts.
 - **FR-015**: When performance limits are exceeded (more than 200,000 selected systems), the CLI MUST warn and continue, and the warning MUST include a suggested `--max-dist-sol` value.
@@ -183,6 +185,8 @@ the breakdown matches the scoring rules.
 - **FR-017a**: The system MUST define quadrants based on X and Y coordinates relative to Sagittarius A* at (25.21875, -20.90625). The Z coordinate MUST be ignored for quadrant determination. NW: x < 25.21875 AND y > -20.90625; NE: x > 25.21875 AND y > -20.90625; SW: x < 25.21875 AND y < -20.90625; SE: x > 25.21875 AND y < -20.90625.
 - **FR-017b**: Quadrant filtering MUST occur during the read phase (before indexing) to discard non-matching systems immediately and reduce memory footprint.
 - **FR-018**: When `--verbose` is enabled, the system MUST report how many systems were discarded due to quadrant filtering.
+- **FR-018a**: The live verbose readout MUST include counts for systems read, populated systems, and discarded by quadrants (and other read-phase filters when enabled).
+- **FR-018b**: The live verbose readout MUST format all numeric counts with a thousands separator.
 - **FR-011**: The system MUST filter systems beyond the max-distance-to-Sol threshold before indexing.
 - **FR-012**: The system MUST partition systems into populated and empty lists before spatial indexing.
 - **FR-013**: The system MUST index systems into 50 LY cubes (on-demand creation) and maintain a list of cubes containing at least one system, with a flag indicating whether the cube contains any populated systems.

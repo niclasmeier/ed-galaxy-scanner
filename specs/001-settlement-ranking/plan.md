@@ -13,6 +13,12 @@ Add transparent support for gzip-compressed input when the provided file name
 ends with `.gz`, using the same JSONL/JSON array parsing rules as uncompressed
 files.
 
+Update verbose reading output to show a continuously updated inline statistics
+line (systems read, populated systems, quadrants discarded, and other read-phase
+filters) instead of printing dots.
+
+Format verbose live stats counts with a thousands separator.
+
 ## Technical Context
 
 <!--
