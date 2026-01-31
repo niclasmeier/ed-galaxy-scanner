@@ -36,6 +36,7 @@
 - [ ] CLI contract covers stdin/args, stdout, stderr, exit codes, JSON output.
 - [ ] Test strategy includes unit tests for scoring/distance/order and a golden test.
 - [ ] Performance bounds and input size assumptions stated.
+- [ ] TypeScript `any` type is not used; `unknown` or proper types used instead.
 
 ## Project Structure
 

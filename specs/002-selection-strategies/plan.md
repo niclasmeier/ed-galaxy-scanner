@@ -33,6 +33,7 @@ Introduce space selection strategies for system filtering: retain the existing s
 - [x] CLI contract covers stdin/args, stdout, stderr, exit codes, JSON output.
 - [x] Test strategy includes unit tests for scoring/distance/order and a golden test.
 - [x] Performance bounds and input size assumptions stated.
+- [x] TypeScript `any` type is not used; `unknown` or proper types used instead.
 
 ## Project Structure
 

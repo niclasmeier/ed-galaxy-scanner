@@ -1,15 +1,16 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.0.1
-- Modified principles: None
-- Added sections: Core Principles, Technical Constraints, Development Workflow, Governance (initial)
-- Removed sections: None
+- Version change: 1.0.1 → 1.0.2
+- Modified principles: Technical Constraints (added `any` type prohibition)
+- Added sections: None
+- Removed sections: None (moved `any` prohibition from Governance to Technical Constraints)
 - Templates requiring updates:
-	- .specify/templates/plan-template.md ✅ updated
+	- .specify/templates/plan-template.md ✅ updated (add `any` check to Constitution Check)
 	- .specify/templates/spec-template.md ✅ no change
-	- .specify/templates/tasks-template.md ✅ updated
+	- .specify/templates/tasks-template.md ✅ no change
 - Follow-up TODOs:
 	- TODO(RATIFICATION_DATE): original adoption date unknown
+	- All existing plan.md files updated with new Constitution Check item
 -->
 # Elite Dangerous Settlement Planner CLI Constitution
 
@@ -50,6 +51,9 @@ Rationale: command-line tools must remain responsive.
 
 - Implementation MUST be TypeScript targeting Bun (current stable).
 - TypeScript `strict` mode MUST be enabled and linting enforced.
+- The TypeScript `any` type is FORBIDDEN in all source code. Use `unknown` for
+	dynamic data that requires runtime validation, proper union types, or generic
+	type parameters with appropriate constraints.
 - The algorithm MUST enforce the rule: select the most valuable system that is
 	within $\le 15\,\text{LY}$ of any previously settled system.
 - Value scoring MUST be deterministic and documented in user-facing help.
@@ -72,6 +76,5 @@ Rationale: command-line tools must remain responsive.
 	core principles and constraints.
 - Compliance is reviewed at PR time; any waiver MUST be documented with scope
 	and expiration.
-- Avoid the use of the any type wherever possible.
 
-**Version**: 1.0.1 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date unknown | **Last Amended**: 2026-01-29
+**Version**: 1.0.2 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date unknown | **Last Amended**: 2026-01-31

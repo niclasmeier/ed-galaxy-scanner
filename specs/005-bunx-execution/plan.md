@@ -28,6 +28,7 @@ Enable bunx-based execution of the settlement planner CLI by adding Bun-compatib
 - [x] CLI contract covers stdin/args, stdout, stderr, exit codes, JSON output. (unchanged; bunx preserves behavior)
 - [x] Test strategy includes unit tests for scoring/distance/order and a golden test. (existing suite preserved)
 - [x] Performance bounds and input size assumptions stated. (unchanged)
+- [x] TypeScript `any` type is not used; `unknown` or proper types used instead. (unchanged)
 
 ## Project Structure
 
