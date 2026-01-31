@@ -3,6 +3,7 @@ import type { ParsedRecord } from "../domain/types.js";
 export interface JsonReadOptions {
   continueOnError: boolean;
   onInvalid?: (index: number) => void;
+  nativeJson?: boolean;
 }
 
 function isGzipPath(input: string): boolean {
@@ -66,6 +67,19 @@ export async function* readJsonLines<T>(
   input: string,
   options: JsonReadOptions,
 ): AsyncGenerator<ParsedRecord<T>> {
+  // Load native simdjson parser if requested
+  let nativeParser: any = null;
+  if (options.nativeJson) {
+    try {
+      nativeParser = await import("@nozbe/simdjson");
+    } catch (error) {
+      throw new Error(
+        "ERROR: --native-json flag set but @nozbe/simdjson native bindings are unavailable. " +
+        "Install via 'npm install @nozbe/simdjson' or remove the --native-json flag.",
+      );
+    }
+  }
+
   const stream = getInputStream(input);
   const decoder = new TextDecoder();
   let buffer = "";
@@ -84,7 +98,14 @@ export async function* readJsonLines<T>(
         continue;
       }
       try {
-        const value = JSON.parse(trimmed) as T;
+        let value: T;
+        if (nativeParser) {
+          // Use native simdjson parser
+          value = nativeParser.parse(trimmed) as T;
+        } else {
+          // Fall back to standard JSON parser
+          value = JSON.parse(trimmed) as T;
+        }
         yield { value, lineNumber };
       } catch (error) {
         if (!options.continueOnError) {
@@ -128,6 +149,19 @@ export async function* readJsonArrayStream<T>(
   input: string,
   options: JsonReadOptions,
 ): AsyncGenerator<ParsedRecord<T>> {
+  // Load native simdjson parser if requested
+  let nativeParser: any = null;
+  if (options.nativeJson) {
+    try {
+      nativeParser = await import("@nozbe/simdjson");
+    } catch (error) {
+      throw new Error(
+        "ERROR: --native-json flag set but @nozbe/simdjson native bindings are unavailable. " +
+        "Install via 'npm install @nozbe/simdjson' or remove the --native-json flag.",
+      );
+    }
+  }
+
   const stream = getInputStream(input);
   const decoder = new TextDecoder();
   let buffer = "";
@@ -200,7 +234,12 @@ export async function* readJsonArrayStream<T>(
           if (trimmed.length > 0) {
             index += 1;
             try {
-              const value = JSON.parse(trimmed) as T;
+              let value: T;
+              if (nativeParser) {
+                value = nativeParser.parse(trimmed) as T;
+              } else {
+                value = JSON.parse(trimmed) as T;
+              }
               yield { value, lineNumber: index };
             } catch (error) {
               if (!options.continueOnError) {
@@ -240,7 +279,12 @@ export async function* readJsonArrayStream<T>(
     if (trimmed.length > 0) {
       index += 1;
       try {
-        const value = JSON.parse(trimmed) as T;
+        let value: T;
+        if (nativeParser) {
+          value = nativeParser.parse(trimmed) as T;
+        } else {
+          value = JSON.parse(trimmed) as T;
+        }
         yield { value, lineNumber: index };
       } catch (error) {
         if (!options.continueOnError) {

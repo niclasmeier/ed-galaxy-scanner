@@ -1,0 +1,1256 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "id64": {
+                "type": "integer"
+            },
+            "name": {
+                "type": "string"
+            },
+            "coords": {
+                "type": "object",
+                "properties": {
+                    "x": {
+                        "type": "number"
+                    },
+                    "y": {
+                        "type": "number"
+                    },
+                    "z": {
+                        "type": "number"
+                    }
+                },
+                "required": [
+                    "x",
+                    "y",
+                    "z"
+                ]
+            },
+            "allegiance": {
+                "type": [
+                    "null",
+                    "string"
+                ]
+            },
+            "government": {
+                "type": "string"
+            },
+            "primaryEconomy": {
+                "type": "string"
+            },
+            "secondaryEconomy": {
+                "type": "string"
+            },
+            "security": {
+                "type": "string"
+            },
+            "population": {
+                "type": "integer"
+            },
+            "bodyCount": {
+                "type": "integer"
+            },
+            "date": {
+                "type": "string"
+            },
+            "bodies": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id64": {
+                            "type": "integer"
+                        },
+                        "bodyId": {
+                            "type": "integer"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "subType": {
+                            "type": "string"
+                        },
+                        "distanceToArrival": {
+                            "type": "number"
+                        },
+                        "mainStar": {
+                            "type": "boolean"
+                        },
+                        "age": {
+                            "type": "integer"
+                        },
+                        "spectralClass": {
+                            "type": [
+                                "null",
+                                "string"
+                            ]
+                        },
+                        "luminosity": {
+                            "type": "string"
+                        },
+                        "absoluteMagnitude": {
+                            "type": "number"
+                        },
+                        "solarMasses": {
+                            "type": "number"
+                        },
+                        "solarRadius": {
+                            "type": "number"
+                        },
+                        "surfaceTemperature": {
+                            "type": "number"
+                        },
+                        "rotationalPeriod": {
+                            "type": "number"
+                        },
+                        "axialTilt": {
+                            "type": "number"
+                        },
+                        "timestamps": {
+                            "type": "object",
+                            "properties": {
+                                "distanceToArrival": {
+                                    "type": "string"
+                                },
+                                "meanAnomaly": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "stations": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "updateTime": {
+                                        "type": "string"
+                                    },
+                                    "controllingFaction": {
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "controllingFactionState": {
+                                        "type": [
+                                            "null",
+                                            "string"
+                                        ]
+                                    },
+                                    "distanceToArrival": {
+                                        "type": "number"
+                                    },
+                                    "primaryEconomy": {
+                                        "type": "string"
+                                    },
+                                    "economies": {
+                                        "type": "object",
+                                        "properties": {
+                                            "Extraction": {
+                                                "type": "number"
+                                            },
+                                            "High Tech": {
+                                                "type": "number"
+                                            },
+                                            "Industrial": {
+                                                "type": "number"
+                                            },
+                                            "Colony": {
+                                                "type": "number"
+                                            },
+                                            "Refinery": {
+                                                "type": "number"
+                                            },
+                                            "Military": {
+                                                "type": "number"
+                                            },
+                                            "Agriculture": {
+                                                "type": "number"
+                                            },
+                                            "Tourism": {
+                                                "type": "number"
+                                            },
+                                            "Terraforming": {
+                                                "type": "number"
+                                            },
+                                            "Service": {
+                                                "type": "number"
+                                            },
+                                            "Private Enterprise": {
+                                                "type": "number"
+                                            },
+                                            "Rescue": {
+                                                "type": "number"
+                                            },
+                                            "Repair": {
+                                                "type": "number"
+                                            }
+                                        }
+                                    },
+                                    "government": {
+                                        "type": "string"
+                                    },
+                                    "services": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "state": {
+                                        "type": "string"
+                                    },
+                                    "landingPads": {
+                                        "type": "object",
+                                        "properties": {
+                                            "large": {
+                                                "type": "integer"
+                                            },
+                                            "medium": {
+                                                "type": "integer"
+                                            },
+                                            "small": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "required": [
+                                            "large",
+                                            "medium",
+                                            "small"
+                                        ]
+                                    },
+                                    "market": {
+                                        "type": "object",
+                                        "properties": {
+                                            "commodities": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "symbol": {
+                                                            "type": "string"
+                                                        },
+                                                        "category": {
+                                                            "type": "string"
+                                                        },
+                                                        "commodityId": {
+                                                            "type": "integer"
+                                                        },
+                                                        "demand": {
+                                                            "type": "integer"
+                                                        },
+                                                        "supply": {
+                                                            "type": "integer"
+                                                        },
+                                                        "buyPrice": {
+                                                            "type": "integer"
+                                                        },
+                                                        "sellPrice": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "buyPrice",
+                                                        "category",
+                                                        "commodityId",
+                                                        "demand",
+                                                        "name",
+                                                        "sellPrice",
+                                                        "supply",
+                                                        "symbol"
+                                                    ]
+                                                }
+                                            },
+                                            "prohibitedCommodities": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "updateTime": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "commodities",
+                                            "prohibitedCommodities",
+                                            "updateTime"
+                                        ]
+                                    },
+                                    "latitude": {
+                                        "type": "number"
+                                    },
+                                    "longitude": {
+                                        "type": "number"
+                                    },
+                                    "allegiance": {
+                                        "type": "string"
+                                    },
+                                    "shipyard": {
+                                        "type": "object",
+                                        "properties": {
+                                            "ships": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "symbol": {
+                                                            "type": "string"
+                                                        },
+                                                        "shipId": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "name",
+                                                        "shipId",
+                                                        "symbol"
+                                                    ]
+                                                }
+                                            },
+                                            "updateTime": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "ships",
+                                            "updateTime"
+                                        ]
+                                    },
+                                    "outfitting": {
+                                        "type": "object",
+                                        "properties": {
+                                            "modules": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "symbol": {
+                                                            "type": "string"
+                                                        },
+                                                        "moduleId": {
+                                                            "type": "integer"
+                                                        },
+                                                        "class": {
+                                                            "type": "integer"
+                                                        },
+                                                        "rating": {
+                                                            "type": "string"
+                                                        },
+                                                        "category": {
+                                                            "type": "string"
+                                                        },
+                                                        "ship": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "category",
+                                                        "class",
+                                                        "moduleId",
+                                                        "name",
+                                                        "rating",
+                                                        "symbol"
+                                                    ]
+                                                }
+                                            },
+                                            "updateTime": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "modules",
+                                            "updateTime"
+                                        ]
+                                    },
+                                    "realName": {
+                                        "type": "string"
+                                    },
+                                    "carrierName": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "id",
+                                    "name",
+                                    "updateTime"
+                                ]
+                            }
+                        },
+                        "updateTime": {
+                            "type": "string"
+                        },
+                        "parents": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "Null": {
+                                        "type": "integer"
+                                    },
+                                    "Star": {
+                                        "type": "integer"
+                                    },
+                                    "Planet": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        },
+                        "orbitalPeriod": {
+                            "type": "number"
+                        },
+                        "semiMajorAxis": {
+                            "type": "number"
+                        },
+                        "orbitalEccentricity": {
+                            "type": "number"
+                        },
+                        "orbitalInclination": {
+                            "type": "number"
+                        },
+                        "argOfPeriapsis": {
+                            "type": "number"
+                        },
+                        "meanAnomaly": {
+                            "type": "number"
+                        },
+                        "ascendingNode": {
+                            "type": "number"
+                        },
+                        "isLandable": {
+                            "type": "boolean"
+                        },
+                        "gravity": {
+                            "type": "number"
+                        },
+                        "earthMasses": {
+                            "type": "number"
+                        },
+                        "radius": {
+                            "type": "number"
+                        },
+                        "surfacePressure": {
+                            "type": "number"
+                        },
+                        "atmosphereType": {
+                            "type": [
+                                "null",
+                                "string"
+                            ]
+                        },
+                        "atmosphereComposition": {
+                            "type": "object",
+                            "properties": {
+                                "Helium": {
+                                    "type": "number"
+                                },
+                                "Hydrogen": {
+                                    "type": "number"
+                                },
+                                "Carbon dioxide": {
+                                    "type": "number"
+                                },
+                                "Nitrogen": {
+                                    "type": "number"
+                                },
+                                "Sulphur dioxide": {
+                                    "type": "number"
+                                },
+                                "Oxygen": {
+                                    "type": "number"
+                                },
+                                "Silicates": {
+                                    "type": "number"
+                                },
+                                "Iron": {
+                                    "type": "number"
+                                },
+                                "Water": {
+                                    "type": "number"
+                                },
+                                "Methane": {
+                                    "type": "number"
+                                },
+                                "Ammonia": {
+                                    "type": "number"
+                                },
+                                "Argon": {
+                                    "type": "number"
+                                },
+                                "Neon": {
+                                    "type": "number"
+                                }
+                            }
+                        },
+                        "terraformingState": {
+                            "type": "string"
+                        },
+                        "signals": {
+                            "type": "object",
+                            "properties": {
+                                "signals": {
+                                    "type": "object",
+                                    "properties": {
+                                        "$SAA_SignalType_Human;": {
+                                            "type": "integer"
+                                        },
+                                        "$SAA_SignalType_Biological;": {
+                                            "type": "integer"
+                                        },
+                                        "$SAA_SignalType_Geological;": {
+                                            "type": "integer"
+                                        },
+                                        "$SAA_SignalType_Other;": {
+                                            "type": "integer"
+                                        },
+                                        "$SAA_SignalType_Thargoid;": {
+                                            "type": "integer"
+                                        },
+                                        "$SAA_SignalType_Guardian;": {
+                                            "type": "integer"
+                                        },
+                                        "$SAA_SignalType_PlanetAnomaly;": {
+                                            "type": "integer"
+                                        },
+                                        "Monazite": {
+                                            "type": "integer"
+                                        },
+                                        "Painite": {
+                                            "type": "integer"
+                                        },
+                                        "Platinum": {
+                                            "type": "integer"
+                                        },
+                                        "Rhodplumsite": {
+                                            "type": "integer"
+                                        },
+                                        "Serendibite": {
+                                            "type": "integer"
+                                        },
+                                        "Alexandrite": {
+                                            "type": "integer"
+                                        },
+                                        "Bromellite": {
+                                            "type": "integer"
+                                        },
+                                        "Grandidierite": {
+                                            "type": "integer"
+                                        },
+                                        "LowTemperatureDiamond": {
+                                            "type": "integer"
+                                        },
+                                        "Opal": {
+                                            "type": "integer"
+                                        },
+                                        "Tritium": {
+                                            "type": "integer"
+                                        },
+                                        "Benitoite": {
+                                            "type": "integer"
+                                        },
+                                        "Musgravite": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "updateTime": {
+                                    "type": "string"
+                                },
+                                "genuses": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "required": [
+                                "signals",
+                                "updateTime"
+                            ]
+                        },
+                        "reserveLevel": {
+                            "type": "string"
+                        },
+                        "rotationalPeriodTidallyLocked": {
+                            "type": "boolean"
+                        },
+                        "rings": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "mass": {
+                                        "type": "number"
+                                    },
+                                    "innerRadius": {
+                                        "type": "number"
+                                    },
+                                    "outerRadius": {
+                                        "type": "number"
+                                    },
+                                    "id64": {
+                                        "type": "integer"
+                                    },
+                                    "signals": {
+                                        "type": "object",
+                                        "properties": {
+                                            "signals": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "Monazite": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Musgravite": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Benitoite": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Alexandrite": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Serendibite": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Platinum": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Rhodplumsite": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Painite": {
+                                                        "type": "integer"
+                                                    },
+                                                    "LowTemperatureDiamond": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Bromellite": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Grandidierite": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Tritium": {
+                                                        "type": "integer"
+                                                    },
+                                                    "Opal": {
+                                                        "type": "integer"
+                                                    },
+                                                    "HydrogenPeroxide": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            },
+                                            "updateTime": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "signals",
+                                            "updateTime"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "innerRadius",
+                                    "mass",
+                                    "name",
+                                    "outerRadius",
+                                    "type"
+                                ]
+                            }
+                        },
+                        "volcanismType": {
+                            "type": "string"
+                        },
+                        "solidComposition": {
+                            "type": "object",
+                            "properties": {
+                                "Ice": {
+                                    "type": "number"
+                                },
+                                "Metal": {
+                                    "type": "number"
+                                },
+                                "Rock": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "Ice",
+                                "Metal",
+                                "Rock"
+                            ]
+                        },
+                        "materials": {
+                            "type": "object",
+                            "properties": {
+                                "Iron": {
+                                    "type": "number"
+                                },
+                                "Nickel": {
+                                    "type": "number"
+                                },
+                                "Niobium": {
+                                    "type": "number"
+                                },
+                                "Selenium": {
+                                    "type": "number"
+                                },
+                                "Technetium": {
+                                    "type": "number"
+                                },
+                                "Tungsten": {
+                                    "type": "number"
+                                },
+                                "Vanadium": {
+                                    "type": "number"
+                                },
+                                "Zinc": {
+                                    "type": "number"
+                                },
+                                "Cadmium": {
+                                    "type": "number"
+                                },
+                                "Chromium": {
+                                    "type": "number"
+                                },
+                                "Manganese": {
+                                    "type": "number"
+                                },
+                                "Polonium": {
+                                    "type": "number"
+                                },
+                                "Zirconium": {
+                                    "type": "number"
+                                },
+                                "Mercury": {
+                                    "type": "number"
+                                },
+                                "Molybdenum": {
+                                    "type": "number"
+                                },
+                                "Yttrium": {
+                                    "type": "number"
+                                },
+                                "Tin": {
+                                    "type": "number"
+                                },
+                                "Carbon": {
+                                    "type": "number"
+                                },
+                                "Phosphorus": {
+                                    "type": "number"
+                                },
+                                "Sulphur": {
+                                    "type": "number"
+                                },
+                                "Tellurium": {
+                                    "type": "number"
+                                },
+                                "Antimony": {
+                                    "type": "number"
+                                },
+                                "Germanium": {
+                                    "type": "number"
+                                },
+                                "Ruthenium": {
+                                    "type": "number"
+                                },
+                                "Arsenic": {
+                                    "type": "number"
+                                }
+                            },
+                            "required": [
+                                "Iron",
+                                "Nickel"
+                            ]
+                        },
+                        "belts": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "mass": {
+                                        "type": "number"
+                                    },
+                                    "innerRadius": {
+                                        "type": "number"
+                                    },
+                                    "outerRadius": {
+                                        "type": "number"
+                                    },
+                                    "id64": {
+                                        "type": "integer"
+                                    },
+                                    "signals": {
+                                        "type": "object",
+                                        "properties": {
+                                            "signals": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "$SAA_SignalType_Human;": {
+                                                        "type": "integer"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "$SAA_SignalType_Human;"
+                                                ]
+                                            },
+                                            "updateTime": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "signals",
+                                            "updateTime"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "innerRadius",
+                                    "mass",
+                                    "name",
+                                    "outerRadius",
+                                    "type"
+                                ]
+                            }
+                        }
+                    },
+                    "required": [
+                        "bodyId",
+                        "id64",
+                        "name",
+                        "stations",
+                        "type",
+                        "updateTime"
+                    ]
+                }
+            },
+            "stations": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "id": {
+                            "type": "integer"
+                        },
+                        "updateTime": {
+                            "type": "string"
+                        },
+                        "distanceToArrival": {
+                            "type": "number"
+                        },
+                        "primaryEconomy": {
+                            "type": "string"
+                        },
+                        "government": {
+                            "type": "string"
+                        },
+                        "services": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "type": {
+                            "type": "string"
+                        },
+                        "landingPads": {
+                            "type": "object",
+                            "properties": {
+                                "large": {
+                                    "type": "integer"
+                                },
+                                "medium": {
+                                    "type": "integer"
+                                },
+                                "small": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": [
+                                "large",
+                                "medium",
+                                "small"
+                            ]
+                        },
+                        "market": {
+                            "type": "object",
+                            "properties": {
+                                "commodities": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "symbol": {
+                                                "type": "string"
+                                            },
+                                            "category": {
+                                                "type": "string"
+                                            },
+                                            "commodityId": {
+                                                "type": "integer"
+                                            },
+                                            "demand": {
+                                                "type": "integer"
+                                            },
+                                            "supply": {
+                                                "type": "integer"
+                                            },
+                                            "buyPrice": {
+                                                "type": "integer"
+                                            },
+                                            "sellPrice": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "required": [
+                                            "buyPrice",
+                                            "category",
+                                            "commodityId",
+                                            "demand",
+                                            "name",
+                                            "sellPrice",
+                                            "supply",
+                                            "symbol"
+                                        ]
+                                    }
+                                },
+                                "prohibitedCommodities": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "updateTime": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "commodities",
+                                "prohibitedCommodities",
+                                "updateTime"
+                            ]
+                        },
+                        "controllingFaction": {
+                            "type": "string"
+                        },
+                        "controllingFactionState": {
+                            "type": [
+                                "null",
+                                "string"
+                            ]
+                        },
+                        "economies": {
+                            "type": "object",
+                            "properties": {
+                                "Private Enterprise": {
+                                    "type": "number"
+                                },
+                                "Colony": {
+                                    "type": "number"
+                                },
+                                "Military": {
+                                    "type": "number"
+                                },
+                                "Agriculture": {
+                                    "type": "number"
+                                },
+                                "Extraction": {
+                                    "type": "number"
+                                },
+                                "High Tech": {
+                                    "type": "number"
+                                },
+                                "Terraforming": {
+                                    "type": "number"
+                                },
+                                "Tourism": {
+                                    "type": "number"
+                                },
+                                "Industrial": {
+                                    "type": "number"
+                                },
+                                "Refinery": {
+                                    "type": "number"
+                                },
+                                "Service": {
+                                    "type": "number"
+                                },
+                                "Rescue": {
+                                    "type": "number"
+                                },
+                                "Prison": {
+                                    "type": "number"
+                                }
+                            }
+                        },
+                        "carrierDockingAccess": {
+                            "type": "string"
+                        },
+                        "shipyard": {
+                            "type": "object",
+                            "properties": {
+                                "ships": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "symbol": {
+                                                "type": "string"
+                                            },
+                                            "shipId": {
+                                                "type": "integer"
+                                            }
+                                        },
+                                        "required": [
+                                            "name",
+                                            "shipId",
+                                            "symbol"
+                                        ]
+                                    }
+                                },
+                                "updateTime": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "ships",
+                                "updateTime"
+                            ]
+                        },
+                        "outfitting": {
+                            "type": "object",
+                            "properties": {
+                                "modules": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "symbol": {
+                                                "type": "string"
+                                            },
+                                            "moduleId": {
+                                                "type": "integer"
+                                            },
+                                            "class": {
+                                                "type": "integer"
+                                            },
+                                            "rating": {
+                                                "type": "string"
+                                            },
+                                            "category": {
+                                                "type": "string"
+                                            },
+                                            "ship": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "required": [
+                                            "category",
+                                            "class",
+                                            "moduleId",
+                                            "name",
+                                            "rating",
+                                            "symbol"
+                                        ]
+                                    }
+                                },
+                                "updateTime": {
+                                    "type": "string"
+                                }
+                            },
+                            "required": [
+                                "modules",
+                                "updateTime"
+                            ]
+                        },
+                        "carrierName": {
+                            "type": "string"
+                        },
+                        "realName": {
+                            "type": "string"
+                        },
+                        "state": {
+                            "type": "string"
+                        },
+                        "allegiance": {
+                            "type": "string"
+                        },
+                        "latitude": {
+                            "type": "number"
+                        },
+                        "longitude": {
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "name",
+                        "updateTime"
+                    ]
+                }
+            },
+            "controllingFaction": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "government": {
+                        "type": "string"
+                    },
+                    "allegiance": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "name"
+                ]
+            },
+            "factions": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "allegiance": {
+                            "type": "string"
+                        },
+                        "government": {
+                            "type": "string"
+                        },
+                        "influence": {
+                            "type": "number"
+                        },
+                        "state": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "allegiance",
+                        "government",
+                        "influence",
+                        "name",
+                        "state"
+                    ]
+                }
+            },
+            "controllingPower": {
+                "type": "string"
+            },
+            "powerState": {
+                "type": "string"
+            },
+            "powerStateControlProgress": {
+                "type": "number"
+            },
+            "powerStateReinforcement": {
+                "type": "integer"
+            },
+            "powerStateUndermining": {
+                "type": "integer"
+            },
+            "powers": {
+                "type": "array",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "timestamps": {
+                "type": "object",
+                "properties": {
+                    "controllingPower": {
+                        "type": "string"
+                    },
+                    "powerState": {
+                        "type": "string"
+                    },
+                    "powers": {
+                        "type": "string"
+                    }
+                }
+            },
+            "powerConflictProgress": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "power": {
+                            "type": "string"
+                        },
+                        "progress": {
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "power",
+                        "progress"
+                    ]
+                }
+            }
+        },
+        "required": [
+            "bodies",
+            "coords",
+            "date",
+            "id64",
+            "name",
+            "stations"
+        ]
+    }
+}

@@ -16,6 +16,13 @@
 - Q: What is the coordinate of Sagittarius A*? → A: (25.21875, -20.90625, 25899.96875); the galactic center used as the origin for quadrant boundaries.
 - Q: When should quadrant filtering happen? → A: During the read phase, discarding systems not in the requested quadrants immediately to reduce memory and processing load.
 
+### Session 2026-01-31
+
+- Q: What happens when Sol is missing from the dataset? → A: The CLI inserts a default Sol system at coordinates (0, 0, 0) and continues.
+- Q: What is the final tie-breaker when scores (and other sort keys) are equal? → A: Alphabetical by system name (ascending).
+- Q: How is “within 150 LY of Sol” determined for `--require-sol-route`? → A: Use the system’s Euclidean distance to Sol based on system coordinates.
+ - Q: How should `--require-sol-route` flag reachable cubes now that system architects are removed? → A: Mark any cube reachable if it contains a system within 150 LY of Sol; remove system-architect filtering entirely.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Generate ranked settlement candidates (Priority: P1)
@@ -168,13 +175,15 @@ the breakdown matches the scoring rules.
   after basic filters (quadrants, max-distance-to-Sol, planet presence). This MUST
   be enabled via `--colonization-mode none` (default: `--colonization-mode standard`).
 - **FR-007b**: When enabled, the system MUST require that eligible systems are
-  reachable from Sol via a chain of systems where each hop is $\le 15\,\text{LY}$.
-  This route constraint MUST be applied before returning candidates and MUST be
-  enabled via `--require-sol-route`.
+  in spatial buckets (cubes) marked reachable because they contain a system whose
+  Euclidean distance to Sol (using system coordinates) is $\le 150\,\text{LY}$. Buckets not
+  marked reachable MUST be discarded before candidate evaluation. This route
+  constraint MUST be applied before returning candidates and MUST be enabled via
+  `--require-sol-route`.
 - **FR-008**: The system MUST define "suitable for settlement" as any empty
   system with at least one planet.
 - **FR-009**: The system MUST output results ordered by total score descending and
-  apply a deterministic tie-breaker (assumption: alphabetical by system name).
+  apply a deterministic tie-breaker by system name ascending.
 - **FR-010**: The system MUST output the ranked list as systems only, including
   total score and a score breakdown.
 - **FR-010a**: The system MUST support a simple output format that includes the
@@ -209,6 +218,12 @@ the breakdown matches the scoring rules.
 - **FR-014a**: The system MUST deduplicate candidates and store the nearest populated
   system name and distance for deterministic output when multiple populated systems
   are within range.
+- **FR-014b**: Each bucket MUST have a reachability flag (true, false, or null)
+  indicating whether the bucket is connected to Sol's bucket. When Sol's bucket is
+  created, the flag MUST be set to true. After all systems are indexed, the system
+  MUST mark any bucket reachable if it contains a system within 150 LY of Sol using
+  Euclidean distance from system coordinates. This reachability computation happens
+  only when `--require-sol-route` is enabled.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -221,7 +236,7 @@ the breakdown matches the scoring rules.
 
 ## Assumptions
 
-- The dataset contains Sol with valid coordinates or the tool will report an error.
+- If Sol is missing, the CLI inserts a default Sol system at (0, 0, 0).
 - Each system provides enough body metadata to count stars and planet types needed
   for scoring.
 - Distance is computed from 3D coordinates using straight-line distance.
@@ -232,18 +247,19 @@ the breakdown matches the scoring rules.
 1. Read systems from input (use simdjson when `--native-json` is set).
 2. Filter out systems beyond the max-distance-to-Sol threshold.
 3. Split systems into populated (population $> 0$) and empty (population $\le 0$).
-4. If `--require-sol-route` is enabled, build a reachability set from Sol using hops of
-  $\le 15$ LY (grid/KD-tree neighbor lookup) and discard systems not reachable.
-5. If `--colonization-mode none` is enabled, score eligible systems directly (empty
-  systems with at least one planet) and skip steps 6–7.
-6. Index systems into radius-sized buckets (created on demand). Maintain a list of
-  buckets that contain at least one system and mark buckets that contain any populated system.
-7. For each bucket with populated systems:
-  - Build the candidate empty list from that bucket plus its 26 adjacent buckets.
+4. Index systems into radius-sized buckets (15 LY) created on demand. Mark buckets that
+  contain any populated system. Initialize Sol's bucket with reachability flag = true.
+5. If `--require-sol-route` is enabled, mark buckets reachable when they contain
+  a system within 150 LY of Sol (Euclidean distance using system coordinates), then
+  discard unreachable buckets from the list.
+6. If `--colonization-mode none` is enabled, score eligible systems directly (empty
+  systems with at least one planet) and skip steps 7–8.
+7. For each reachable bucket with populated systems:
+  - Build the candidate empty list from that bucket plus its 26 adjacent reachable buckets.
   - For each populated system in the current bucket, measure distance to candidate empties.
   - If distance $\le 15$ LY, compute score, track nearest populated system, and
    deduplicate candidates deterministically.
-8. After all buckets are processed, sort results by score (desc) then name (asc) and return.
+8. After all reachable buckets are processed, sort results by score (desc) then name (asc) and return.
 
 ## Success Criteria *(mandatory)*
 

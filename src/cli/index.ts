@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { Command } from "commander";
-import { findEligibleCandidatesWithNearest } from "../domain/settlement.js";
+import { findEligibleCandidatesWithNearest, cubeKey, findReachableCubeKeysBySolDistance } from "../domain/settlement.js";
 import { computeScore, shouldIncludeTritium, countIcyRings } from "../domain/scoring.js";
 import { parseSortSpec, validateSortSpec, applySortSpec, DEFAULT_SORT_SPEC } from "../domain/sorting.js";
 import { applySpaceSelection } from "../domain/selection.js";
@@ -34,6 +34,9 @@ program
   .option("--format <format>", "Output format: json, text, or simple", "simple")
   .option("--continue-on-error", "Skip invalid JSON lines and continue", true)
   .option("--verbose", "Enable verbose progress and summary output", false)
+  .option("--colonization-mode <mode>", "Colonization eligibility mode: standard or none (default: standard)", "standard")
+  .option("--require-sol-route", "Require systems to be in cubes with systems within 150 LY of Sol", false)
+  .option("--native-json", "Use @nozbe/simdjson native bindings for JSON parsing (requires native bindings)", false)
   .addHelpText("after", "\nBunx usage: bunx settlement-planner [options]\n")
   .parse(process.argv);
 
@@ -198,6 +201,7 @@ async function readSystems(
   verbose: boolean,
   quadrants?: Set<QuadrantName>,
   scoringStrategy?: ScoringStrategyName,
+  nativeJson?: boolean,
 ): Promise<{ systems: StarSystem[]; stats: ReadStats }> {
   const stats: ReadStats = {
     brokenLines: 0,
@@ -247,7 +251,7 @@ async function readSystems(
 
   if (input === "-") {
     const systems = await processRecords(
-      readJsonLines<StarSystem>(input, { continueOnError, onInvalid }),
+      readJsonLines<StarSystem>(input, { continueOnError, onInvalid, nativeJson }),
       ctx,
     );
     return { systems, stats };
@@ -262,14 +266,14 @@ async function readSystems(
   if (isArray) {
     ctx.errorPrefix = "in JSON array at index";
     const systems = await processRecords(
-      readJsonArrayStream<StarSystem>(input, { continueOnError, onInvalid }),
+      readJsonArrayStream<StarSystem>(input, { continueOnError, onInvalid, nativeJson }),
       ctx,
     );
     return { systems, stats };
   }
 
   const systems = await processRecords(
-    readJsonLines<StarSystem>(input, { continueOnError, onInvalid }),
+    readJsonLines<StarSystem>(input, { continueOnError, onInvalid, nativeJson }),
     ctx,
   );
   return { systems, stats };
@@ -316,6 +320,12 @@ async function main(): Promise<void> {
     if (format !== "json" && format !== "text" && format !== "simple") {
       throw new Error("--format must be one of: json, text, simple");
     }
+    const colonizationMode = String(options.colonizationMode ?? "standard").toLowerCase();
+    if (colonizationMode !== "standard" && colonizationMode !== "none") {
+      throw new Error("--colonization-mode must be one of: standard, none");
+    }
+    const requireSolRoute = Boolean(options.requireSolRoute ?? false);
+    const nativeJson = Boolean(options.nativeJson ?? false);
 
     const verbose = Boolean(options.verbose);
     
@@ -348,7 +358,7 @@ async function main(): Promise<void> {
       throw new Error(`Invalid sort specification: ${error instanceof Error ? error.message : String(error)}`);
     }
 
-    const { systems, stats } = await readSystems(input, Boolean(options.continueOnError), verbose, quadrants, scoringStrategy);
+    const { systems, stats } = await readSystems(input, Boolean(options.continueOnError), verbose, quadrants, scoringStrategy, nativeJson);
     let sol = systems.find((system) => system.name === "Sol");
     if (!sol) {
       sol = {coords: {x: 0.0, y: 0.0, z: 0.0}, id64: 10477373803, name: "Sol", population: 18320926115, bodies: []};
@@ -369,11 +379,39 @@ async function main(): Promise<void> {
     const emptyCount = scopedSystems.filter((system) => system.population <= 0).length;
     const populatedCount = scopedSystems.length - emptyCount;
 
-    const { candidates: eligible, cubeIndex } = findEligibleCandidatesWithNearest(scopedSystems, {
+    // Get eligible candidates based on colonization mode
+    let eligible;
+    let routeScopedSystems = scopedSystems;
+
+    if (requireSolRoute) {
+      const reachableCubeKeys = findReachableCubeKeysBySolDistance(scopedSystems, sol.coords, 150);
+      routeScopedSystems = scopedSystems.filter((system) => reachableCubeKeys.has(cubeKey(system.coords)));
+    }
+
+    if (colonizationMode === "none") {
+      // Return all empty systems with planets, not limited by proximity to populated
+      eligible = routeScopedSystems
+        .filter((system) => system.population <= 0)
+        .filter((system) => {
+          const planetCount = (system.bodies ?? []).filter((body) => body.type.toLowerCase() === "planet").length;
+          return planetCount > 0;
+        })
+        .map((system) => ({ system, nearestPopulatedName: "N/A" }));
+    } else {
+      // Default: standard mode - only 15 LY near populated systems
+      const result = findEligibleCandidatesWithNearest(routeScopedSystems, {
+        maxDistSol: selectionStrategyMode === "sphere" ? maxDistSol : undefined,
+        solName: "Sol",
+        sol,
+      });
+      eligible = result.candidates;
+    }
+
+    const cubeIndex = findEligibleCandidatesWithNearest(routeScopedSystems, {
       maxDistSol: selectionStrategyMode === "sphere" ? maxDistSol : undefined,
       solName: "Sol",
       sol,
-    });
+    }).cubeIndex;
     const quadrantCount = cubeIndex.cubes.size;
 
     const candidates = eligible.map(({ system, nearestPopulatedName }) => {

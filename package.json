@@ -29,6 +29,7 @@
     "postinstall": "chmod +x src/cli/index.ts"
   },
   "dependencies": {
+    "@nozbe/simdjson": "^3.9.4",
     "commander": "^12.1.0"
   },
   "devDependencies": {

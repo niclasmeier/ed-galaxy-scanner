@@ -9,10 +9,15 @@
 
 [Extract from feature spec: primary requirement + technical approach from research]
 
-Define colonization eligibility modes with flags: default single-pass (within
-15 LY of populated systems) via `--colonization-mode single-pass`, optional
+Define colonization eligibility modes with flags: default standard (within
+15 LY of populated systems) via `--colonization-mode standard`, optional
 bypass mode via `--colonization-mode none`, and an optional "route-from-Sol"
-constraint via `--require-sol-route` that requires reachability via 15 LY hops.
+constraint via `--require-sol-route` using cube-based reachability flagging.
+
+Implement cube-based reachability by: (1) marking Sol's cube with reachability
+flag = true when created, (2) marking any cube reachable if it contains a star
+system within 150 LY of Sol, (3) discarding unreachable cubes from iteration, and
+(4) only evaluating candidates in reachable cubes.
 
 Tune spatial indexing to the 15 LY eligibility radius (bucket size = 15 LY)
 and ensure deterministic nearest-populated tracking with candidate deduplication.

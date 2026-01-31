@@ -1,7 +1,7 @@
 import type { Coords, SettlementCandidate, StarSystem } from "./types.js";
 import { distance } from "../utils/distance.js";
 
-export const CUBE_SIZE_LY = 50;
+export const CUBE_SIZE_LY = 15;
 
 export interface CubeIndex {
   cubes: Map<string, StarSystem[]>;
@@ -169,4 +169,23 @@ export function sortCandidates(candidates: SettlementCandidate[]): SettlementCan
     }
     return a.name.localeCompare(b.name);
   });
+}
+
+export function findReachableCubeKeysBySolDistance(
+  systems: StarSystem[],
+  solCoords: Coords,
+  maxDistance: number = 150,
+): Set<string> {
+  const reachable = new Set<string>();
+
+  for (const system of systems) {
+    const d = distance(system.coords, solCoords);
+    if (d <= maxDistance) {
+      reachable.add(cubeKey(system.coords));
+    }
+  }
+
+  // Ensure Sol's cube is always reachable
+  reachable.add(cubeKey(solCoords));
+  return reachable;
 }

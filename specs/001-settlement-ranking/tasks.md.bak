@@ -154,9 +154,8 @@ maintaining deterministic outputs and performance bounds.
 
 - [x] T052 Add CLI flags `--colonization-mode` (standard|none) and `--require-sol-route`
 - [x] T053 Update settlement candidate search to use 15 LY bucket sizing
-- [x] T054 Implement cube-based reachability flagging: mark Sol's cube reachable,
-  mark cubes reachable when they contain a star system within 150 LY of Sol,
-  discard unreachable cubes
+- [ ] T054 Implement cube-based reachability flagging: mark Sol's cube reachable,
+  propagate reachability transitively to adjacent cubes, discard unreachable cubes
 - [x] T055 Track nearest populated system and deduplicate candidates deterministically
 - [x] T056 Add `--native-json` flag and wire `@nozbe/simdjson` Node-API bindings for parsing
 - [x] T057 Implement clear error path when `@nozbe/simdjson` native bindings are unavailable
