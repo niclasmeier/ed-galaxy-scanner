@@ -1,6 +1,6 @@
 import { describe, test, expect } from "bun:test";
 
-const fixturePath = "tests/integration/fixtures/galaxy.fixture.jsonl";
+const fixturePath = "tests/integration/fixtures/galaxy.fixture.array.json";
 
 describe("Colonization Modes Integration Tests", () => {
   test("T050: --colonization-mode none returns all empty systems with planets", () => {

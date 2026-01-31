@@ -28,7 +28,7 @@ describe("CLI gzip input", () => {
         "run",
         "src/cli/index.ts",
         "--input",
-        "tests/integration/fixtures/galaxy.fixture.jsonl.gz",
+        "tests/integration/fixtures/galaxy.fixture.array.json.gz",
         "--max-dist-sol",
         "1000",
         "--use-quadrants",

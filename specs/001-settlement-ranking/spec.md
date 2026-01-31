@@ -92,7 +92,7 @@ the breakdown matches the scoring rules.
 
 - What happens when the input file is missing or unreadable?
 - What happens when the input file ends with .gz but is not a valid gzip file?
-- How does the tool handle a line that is not valid JSON? It skips the line, logs a warning, and continues processing.
+- How does the tool handle invalid JSON? It fails with a clear error message.
 - What happens when Sol is not present in the dataset?
 - How are ties handled when multiple systems share the same score?
 - What happens when no populated systems exist in the dataset?
@@ -147,14 +147,15 @@ the breakdown matches the scoring rules.
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST accept a file path input and process either line-delimited
-  JSON objects (JSONL) or a single JSON array of star systems.
+- **FR-001**: The system MUST accept a file path input and process a JSON array of star systems.
 - **FR-001a**: If the input file name ends with `.gz`, the system MUST transparently
-  decompress the file and parse it as JSONL or a JSON array using the same rules as
+  decompress the file and parse it as a JSON array using the same rules as
   uncompressed input.
-- **FR-001b**: When `--native-json` is set, the system MUST parse JSON using
-  `@nozbe/simdjson` (Node-API native bindings) for both JSONL and JSON array inputs.
-  If native bindings are unavailable, the CLI MUST fail with a clear error message.
+- **FR-001b**: The system MUST use the `stream-json` library with `chain()` function to efficiently
+  parse JSON arrays while automatically handling gzip decompression. During streaming, the parser
+  MUST select only the required fields (name, coords, population, allegiance, bodies, stations)
+  to minimize memory usage. Stream events MUST be used to build indexes and spatial buckets
+  on-the-fly during the parse phase rather than requiring a second pass.
 - **FR-002**: The system MUST classify systems as populated when population $> 0$
   and empty when population $\le 0$.
 - **FR-003**: The system MUST allow a max distance to Sol parameter, defaulting
@@ -244,22 +245,25 @@ the breakdown matches the scoring rules.
 
 ## Algorithm Outline (authoritative)
 
-1. Read systems from input (use simdjson when `--native-json` is set).
-2. Filter out systems beyond the max-distance-to-Sol threshold.
-3. Split systems into populated (population $> 0$) and empty (population $\le 0$).
-4. Index systems into radius-sized buckets (15 LY) created on demand. Mark buckets that
-  contain any populated system. Initialize Sol's bucket with reachability flag = true.
-5. If `--require-sol-route` is enabled, mark buckets reachable when they contain
-  a system within 150 LY of Sol (Euclidean distance using system coordinates), then
-  discard unreachable buckets from the list.
-6. If `--colonization-mode none` is enabled, score eligible systems directly (empty
-  systems with at least one planet) and skip steps 7–8.
-7. For each reachable bucket with populated systems:
+1. Read systems from JSON array input using `stream-json` with `chain()` function,
+   automatically handling gzip decompression. Select only required fields during streaming
+   (name, coords, population, allegiance, bodies, stations).
+2. As each system is emitted from the stream:
+   - Filter out systems beyond the max-distance-to-Sol threshold.
+   - Classify as populated (population $> 0$) or empty (population $\le 0$).
+   - Index directly into radius-sized buckets (15 LY) created on demand.
+   - Mark buckets containing populated systems.
+3. After all systems are indexed:
+   - If `--require-sol-route` is enabled, mark buckets reachable when they contain
+     a system within 150 LY of Sol (Euclidean distance), then discard unreachable buckets.
+4. If `--colonization-mode none` is enabled, score eligible systems directly (empty
+  systems with at least one planet) and skip steps 5–6.
+5. For each reachable bucket with populated systems:
   - Build the candidate empty list from that bucket plus its 26 adjacent reachable buckets.
   - For each populated system in the current bucket, measure distance to candidate empties.
   - If distance $\le 15$ LY, compute score, track nearest populated system, and
    deduplicate candidates deterministically.
-8. After all reachable buckets are processed, sort results by score (desc) then name (asc) and return.
+6. After all reachable buckets are processed, sort results by score (desc) then name (asc) and return.
 
 ## Success Criteria *(mandatory)*
 

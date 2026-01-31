@@ -22,12 +22,14 @@ system within 150 LY of Sol, (3) discarding unreachable cubes from iteration, an
 Tune spatial indexing to the 15 LY eligibility radius (bucket size = 15 LY)
 and ensure deterministic nearest-populated tracking with candidate deduplication.
 
-Add optional native JSON parsing via `@nozbe/simdjson` (Node-API) when `--native-json`
-is set, with clear errors if native bindings are unavailable.
+Use `stream-json` library with `chain()` function for efficient streaming JSON parsing
+that automatically handles gzip-compressed files. Implement field selection during streaming
+to extract only required fields (name, coords, population, allegiance, bodies, stations),
+minimizing memory footprint. Drive spatial indexing and bucket creation directly from
+stream events during parsing, eliminating the need for a separate indexing pass.
 
 Add transparent support for gzip-compressed input when the provided file name
-ends with `.gz`, using the same JSONL/JSON array parsing rules as uncompressed
-files.
+ends with `.gz`, using the same JSON array parsing rules as uncompressed files.
 
 Update verbose reading output to show a continuously updated inline statistics
 line (systems read, populated systems, quadrants discarded, and other read-phase

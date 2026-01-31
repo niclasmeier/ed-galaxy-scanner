@@ -22,7 +22,7 @@ function parseJsonOutput(output: string): unknown[] {
 }
 
 describe("CLI sort flag", () => {
-  const input = "tests/integration/fixtures/galaxy.fixture.jsonl";
+  const input = "tests/integration/fixtures/galaxy.fixture.array.json";
 
   describe("default sort behavior", () => {
     it("should use score-desc,dsol-asc as default", () => {

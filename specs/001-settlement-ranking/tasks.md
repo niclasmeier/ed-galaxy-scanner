@@ -1,3 +1,6 @@
+- [x] T056
+- [x] T057
+- [x] T059
 ---
 
 description: "Task list for Settlement Candidate Ranking CLI"
@@ -29,10 +32,8 @@ description: "Task list for Settlement Candidate Ranking CLI"
 - [x] T005a [P] Add quadrant constants (SAGITTARIUS_A, quadrant definitions) in src/domain/types.ts or dedicated quadrant utility
 - [x] T006 [P] Implement distance utility in src/utils/distance.ts (Euclidean distance, Sol distance)
 - [x] T006a [P] Implement quadrant determination utility in src/utils/quadrant.ts or src/domain/quadrant.ts
-- [x] T007 [P] Implement JSONL reader in src/io/jsonl.ts with line parsing, line numbers, and error handling
-- [x] T007a [P] Extend JSONL reader to apply quadrant filtering during read (discard non-matching systems early)
-- [x] T008 [P] Implement JSON array reader in src/io/jsonl.ts (or separate module) for single-list JSON input
-- [x] T008a [P] Extend JSON array reader to apply quadrant filtering during read
+- [x] T007 [P] Implement JSON array reader in src/io/jsonl.ts with streaming parsing and error handling
+- [x] T007a [P] Extend JSON array reader to apply quadrant filtering during read (discard non-matching systems early)
 - [x] T009 Implement cube index in src/domain/settlement.ts (50 LY cube keys, on-demand cube creation, systems list, populated flag, and list of cubes with ≥1 system)
 - [x] T010 Implement output formatter in src/io/output.ts for JSON and text output
 - [x] T011 Implement performance guardrails: warn and offer reduced-scope option when limits exceeded
@@ -128,7 +129,7 @@ description: "Task list for Settlement Candidate Ranking CLI"
 - [x] T039 [P] Add quadrant examples to quickstart.md
 - [x] T040 [P] Test quadrant filtering with multi-quadrant queries (e.g., "SW,SE" or "all")
 - [x] T041 [P] Add gzip input support when filename ends with .gz
-- [x] T042 [P] Add tests for gzip input handling (valid gzip JSONL and JSON array)
+- [x] T042 [P] Add tests for gzip input handling (valid gzip JSON array)
 - [x] T043 [P] Document gzip input usage and error behavior in quickstart/help
 - [x] T044 [P] Update verbose output to show live read stats (systems read, populated, quadrant-discarded, other filters) instead of dots
 - [x] T045 [P] Add tests for verbose live stats output formatting
@@ -148,7 +149,6 @@ maintaining deterministic outputs and performance bounds.
 - [x] T049 [P] Add unit tests for candidate deduplication and nearest-populated tracking
 - [x] T050 [P] Add integration tests for "no colonization check" mode
 - [x] T051 [P] Add integration tests for "route-from-Sol" constraint (exclude Colonia)
-- [x] T051a [P] Add integration tests for `--native-json` success and missing-binding error
 
 ### Implementation
 
@@ -158,8 +158,10 @@ maintaining deterministic outputs and performance bounds.
   mark cubes reachable when they contain a star system within 150 LY of Sol,
   discard unreachable cubes
 - [x] T055 Track nearest populated system and deduplicate candidates deterministically
-- [x] T056 Add `--native-json` flag and wire `@nozbe/simdjson` Node-API bindings for parsing
-- [x] T057 Implement clear error path when `@nozbe/simdjson` native bindings are unavailable
+- [ ] T056 [P] Replace JSON parsing with `stream-json` library using `chain()` function for efficient streaming
+- [ ] T057 [P] Implement field selection in stream-json chain to extract only required fields (name, coords, population, allegiance, bodies, stations)
+- [ ] T058 [P] Implement event-driven indexing: build spatial buckets and indexes directly from stream events during parsing
+- [ ] T059 [P] Add tests for stream-json parsing with gzip input and field selection
 
 ## Dependencies & Execution Order
 

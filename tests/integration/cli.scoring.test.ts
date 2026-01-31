@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-const fixturePath = "tests/integration/fixtures/galaxy.fixture.jsonl";
+const fixturePath = "tests/integration/fixtures/galaxy.fixture.array.json";
 
 describe("CLI scoring strategies", () => {
   test("--scoring industrial (default behavior)", () => {

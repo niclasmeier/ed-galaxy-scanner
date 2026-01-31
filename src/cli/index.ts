@@ -6,7 +6,7 @@ import { computeScore, shouldIncludeTritium, countIcyRings } from "../domain/sco
 import { parseSortSpec, validateSortSpec, applySortSpec, DEFAULT_SORT_SPEC } from "../domain/sorting.js";
 import { applySpaceSelection } from "../domain/selection.js";
 import type { SpaceSelectionStrategy, StarSystem, ScoringStrategyName } from "../domain/types.js";
-import { detectJsonArrayInput, readJsonArrayStream, readJsonLines } from "../io/jsonl.js";
+import { detectJsonArrayInput, readJsonArrayStream } from "../io/jsonl.js";
 import { formatCandidates, type OutputFormat } from "../io/output.js";
 import { distanceToSol } from "../utils/distance.js";
 import { isSystemInQuadrants, parseQuadrants, type QuadrantName } from "../utils/quadrant.js";
@@ -36,7 +36,6 @@ program
   .option("--verbose", "Enable verbose progress and summary output", false)
   .option("--colonization-mode <mode>", "Colonization eligibility mode: standard or none (default: standard)", "standard")
   .option("--require-sol-route", "Require systems to be in cubes with systems within 150 LY of Sol", false)
-  .option("--native-json", "Use @nozbe/simdjson native bindings for JSON parsing (requires native bindings)", false)
   .addHelpText("after", "\nBunx usage: bunx settlement-planner [options]\n")
   .parse(process.argv);
 
@@ -201,7 +200,6 @@ async function readSystems(
   verbose: boolean,
   quadrants?: Set<QuadrantName>,
   scoringStrategy?: ScoringStrategyName,
-  nativeJson?: boolean,
 ): Promise<{ systems: StarSystem[]; stats: ReadStats }> {
   const stats: ReadStats = {
     brokenLines: 0,
@@ -246,12 +244,12 @@ async function readSystems(
     continueOnError,
     writeLiveStats,
     reportRead,
-    errorPrefix: "on line",
+    errorPrefix: "in JSON array at index",
   };
 
   if (input === "-") {
     const systems = await processRecords(
-      readJsonLines<StarSystem>(input, { continueOnError, onInvalid, nativeJson }),
+      readJsonArrayStream<StarSystem>(input, { continueOnError, onInvalid }),
       ctx,
     );
     return { systems, stats };
@@ -263,17 +261,12 @@ async function readSystems(
   }
 
   const isArray = await detectJsonArrayInput(input);
-  if (isArray) {
-    ctx.errorPrefix = "in JSON array at index";
-    const systems = await processRecords(
-      readJsonArrayStream<StarSystem>(input, { continueOnError, onInvalid, nativeJson }),
-      ctx,
-    );
-    return { systems, stats };
+  if (!isArray) {
+    throw new Error("Input must be a JSON array. Line-delimited JSON (JSONL) is not supported.");
   }
-
+  
   const systems = await processRecords(
-    readJsonLines<StarSystem>(input, { continueOnError, onInvalid, nativeJson }),
+    readJsonArrayStream<StarSystem>(input, { continueOnError, onInvalid }),
     ctx,
   );
   return { systems, stats };
@@ -325,7 +318,6 @@ async function main(): Promise<void> {
       throw new Error("--colonization-mode must be one of: standard, none");
     }
     const requireSolRoute = Boolean(options.requireSolRoute ?? false);
-    const nativeJson = Boolean(options.nativeJson ?? false);
 
     const verbose = Boolean(options.verbose);
     
@@ -358,7 +350,7 @@ async function main(): Promise<void> {
       throw new Error(`Invalid sort specification: ${error instanceof Error ? error.message : String(error)}`);
     }
 
-    const { systems, stats } = await readSystems(input, Boolean(options.continueOnError), verbose, quadrants, scoringStrategy, nativeJson);
+    const { systems, stats } = await readSystems(input, Boolean(options.continueOnError), verbose, quadrants, scoringStrategy);
     let sol = systems.find((system) => system.name === "Sol");
     if (!sol) {
       sol = {coords: {x: 0.0, y: 0.0, z: 0.0}, id64: 10477373803, name: "Sol", population: 18320926115, bodies: []};
