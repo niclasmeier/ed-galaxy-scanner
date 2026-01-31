@@ -17,6 +17,9 @@ constraint via `--require-sol-route` that requires reachability via 15 LY hops.
 Tune spatial indexing to the 15 LY eligibility radius (bucket size = 15 LY)
 and ensure deterministic nearest-populated tracking with candidate deduplication.
 
+Add optional native JSON parsing via `@nozbe/simdjson` (Node-API) when `--native-json`
+is set, with clear errors if native bindings are unavailable.
+
 Add transparent support for gzip-compressed input when the provided file name
 ends with `.gz`, using the same JSONL/JSON array parsing rules as uncompressed
 files.

@@ -145,6 +145,9 @@ the breakdown matches the scoring rules.
 - **FR-001a**: If the input file name ends with `.gz`, the system MUST transparently
   decompress the file and parse it as JSONL or a JSON array using the same rules as
   uncompressed input.
+- **FR-001b**: When `--native-json` is set, the system MUST parse JSON using
+  `@nozbe/simdjson` (Node-API native bindings) for both JSONL and JSON array inputs.
+  If native bindings are unavailable, the CLI MUST fail with a clear error message.
 - **FR-002**: The system MUST classify systems as populated when population $> 0$
   and empty when population $\le 0$.
 - **FR-003**: The system MUST allow a max distance to Sol parameter, defaulting
@@ -197,7 +200,6 @@ the breakdown matches the scoring rules.
 - **FR-018b**: The live verbose readout MUST format all numeric counts with a thousands separator.
 - **FR-011**: The system MUST filter systems beyond the max-distance-to-Sol threshold before indexing.
 - **FR-012**: The system MUST partition systems into populated and empty lists before spatial indexing.
-- **FR-013**: The system MUST index systems into 50 LY cubes (on-demand creation) and maintain a list of cubes containing at least one system, with a flag indicating whether the cube contains any populated systems.
 - **FR-013**: The system MUST index systems into spatial buckets sized to the
   eligibility radius (default 15 LY) and maintain a list of buckets containing at
   least one system, with a flag indicating whether the bucket contains any populated systems.
@@ -227,7 +229,7 @@ the breakdown matches the scoring rules.
 
 ## Algorithm Outline (authoritative)
 
-1. Read systems from input.
+1. Read systems from input (use simdjson when `--native-json` is set).
 2. Filter out systems beyond the max-distance-to-Sol threshold.
 3. Split systems into populated (population $> 0$) and empty (population $\le 0$).
 4. If `--require-sol-route` is enabled, build a reachability set from Sol using hops of

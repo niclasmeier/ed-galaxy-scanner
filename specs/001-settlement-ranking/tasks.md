@@ -148,6 +148,7 @@ maintaining deterministic outputs and performance bounds.
 - [ ] T049 [P] Add unit tests for candidate deduplication and nearest-populated tracking
 - [ ] T050 [P] Add integration tests for "no colonization check" mode
 - [ ] T051 [P] Add integration tests for "route-from-Sol" constraint (exclude Colonia)
+- [ ] T051a [P] Add integration tests for `--native-json` success and missing-binding error
 
 ### Implementation
 
@@ -155,6 +156,8 @@ maintaining deterministic outputs and performance bounds.
 - [ ] T053 Update settlement candidate search to use 15 LY bucket sizing
 - [ ] T054 Implement reachability filter (BFS/DFS from Sol via 15 LY hops)
 - [ ] T055 Track nearest populated system and deduplicate candidates deterministically
+- [ ] T056 Add `--native-json` flag and wire `@nozbe/simdjson` Node-API bindings for parsing
+- [ ] T057 Implement clear error path when `@nozbe/simdjson` native bindings are unavailable
 
 ## Dependencies & Execution Order
 
