@@ -54,6 +54,7 @@ Rationale: command-line tools must remain responsive.
 	within $\le 15\,\text{LY}$ of any previously settled system.
 - Value scoring MUST be deterministic and documented in user-facing help.
 
+
 ## Development Workflow
 
 - All changes MUST include updates to help text or docs if they alter CLI flags
@@ -71,5 +72,6 @@ Rationale: command-line tools must remain responsive.
 	core principles and constraints.
 - Compliance is reviewed at PR time; any waiver MUST be documented with scope
 	and expiration.
+- Avoid the use of the any type wherever possible.
 
 **Version**: 1.0.1 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date unknown | **Last Amended**: 2026-01-29

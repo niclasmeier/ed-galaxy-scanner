@@ -1,4 +1,11 @@
-import type { Body, ScoreBreakdown, StarSystem, ScoringStrategyName } from "./types.js";
+import type {
+  Body,
+  Ring,
+  ScoreBreakdown,
+  StarSystem,
+  ScoringStrategyName,
+  TritiumScoreBreakdown,
+} from "./types.js";
 
 export interface ScoreResult {
   total: number;
@@ -41,7 +48,7 @@ function isTerraformable(body: Body): boolean {
  * @param ring - The ring object to check
  * @returns The ring class/type value, or undefined if neither attribute exists
  */
-function getRingClassType(ring: any): string | undefined {
+function getRingClassType(ring: Ring): string | undefined {
   return ring.ringClass ?? ring.type;
 }
 
@@ -132,17 +139,17 @@ export function computeAgricultureScore(system: StarSystem): ScoreResult {
  * @param system - The star system to score
  * @returns A scoring result with icy ring counts and points
  */
-export function computeTritiumScore(
-  system: StarSystem,
-): { total: number; breakdown: Record<string, { count: number; points: number }> } {
-  const breakdown: Record<string, { count: number; points: number }> = {
+export function computeTritiumScore(system: StarSystem): { total: number; breakdown: TritiumScoreBreakdown } {
+  const breakdown: TritiumScoreBreakdown = {
     regular: { count: 0, points: 0 },
     pristine: { count: 0, points: 0 },
   };
 
   for (const body of system.bodies) {
-    const rings = [...(body.rings && Array.isArray(body.rings) ? body.rings : []),
-    ...(body.belts && Array.isArray(body.belts) ? body.belts : [])];
+    const rings = [
+      ...(body.rings && Array.isArray(body.rings) ? body.rings : []),
+      ...(body.belts && Array.isArray(body.belts) ? body.belts : []),
+    ];
     for (const ring of rings) {
       // Check if ring is icy type (ringClass or type attribute, case-insensitive)
       const ringType = getRingClassType(ring);
@@ -196,9 +203,8 @@ export function countIcyRings(system: StarSystem): number {
       }
     }
     // Check belts array (alternative attribute name in some data)
-    const bodyAny = body as any;
-    if (bodyAny.belts && Array.isArray(bodyAny.belts)) {
-      for (const belt of bodyAny.belts) {
+    if (body.belts && Array.isArray(body.belts)) {
+      for (const belt of body.belts) {
         const beltType = getRingClassType(belt);
         if (beltType?.toLowerCase() === "icy") {
           count += 1;

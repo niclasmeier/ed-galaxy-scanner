@@ -74,6 +74,11 @@ export interface ScoreBreakdown {
   highMetalContent: ScoreComponent;
 }
 
+export interface TritiumScoreBreakdown {
+  regular: ScoreComponent;
+  pristine: ScoreComponent;
+}
+
 export interface SettlementCandidate {
   name: string;
   nearestPopulatedName: string;

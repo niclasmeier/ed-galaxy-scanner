@@ -19,6 +19,11 @@ export interface EligibleCandidate {
   nearestPopulatedName: string;
 }
 
+export interface EligibleCandidatesResult {
+  candidates: EligibleCandidate[];
+  cubeIndex: CubeIndex;
+}
+
 export function toCubeCoord(value: number): number {
   return Math.floor(value / CUBE_SIZE_LY);
 }
@@ -65,7 +70,7 @@ export function neighborCubeKeys(key: string): string[] {
   return keys;
 }
 
-export function warnIfLargeDataset(count: number, threshold = 50000): void {
+export function warnIfLargeDataset(count: number, threshold = 200000): void {
   if (count > threshold) {
     console.error(
       `Warning: ${count} systems exceed the recommended limit (${threshold}). ` +
@@ -77,7 +82,7 @@ export function warnIfLargeDataset(count: number, threshold = 50000): void {
 export function findEligibleCandidatesWithNearest(
   systems: StarSystem[],
   options: CandidateSearchOptions,
-): EligibleCandidate[] {
+): EligibleCandidatesResult {
   const solName = options.solName ?? "Sol";
   const sol = options.sol ?? systems.find((system) => system.name === solName);
   if (!sol) {
@@ -87,11 +92,12 @@ export function findEligibleCandidatesWithNearest(
   const maxDistSol = options.maxDistSol;
   const filtered = typeof maxDistSol === "number"
     ? systems.filter((system) => distance(system.coords, sol.coords) <= maxDistSol)
-    : [...systems];
+    : systems;
 
   warnIfLargeDataset(filtered.length);
 
-  const { cubes } = buildCubeIndex(filtered);
+  const cubeIndex = buildCubeIndex(filtered);
+  const { cubes } = cubeIndex;
 
   const populatedByCube = new Map<string, StarSystem[]>();
   for (const [key, list] of cubes.entries()) {
@@ -102,7 +108,7 @@ export function findEligibleCandidatesWithNearest(
   }
 
   const seen = new Set<number>();
-  const results: EligibleCandidate[] = [];
+  const candidates: EligibleCandidate[] = [];
 
   for (const system of filtered) {
     if (system.population > 0) {
@@ -138,25 +144,22 @@ export function findEligibleCandidatesWithNearest(
           }
         }
       }
-      if (withinRange) {
-        break;
-      }
     }
 
     if (withinRange && !seen.has(system.id64) && nearestName) {
       seen.add(system.id64);
-      results.push({ system, nearestPopulatedName: nearestName });
+      candidates.push({ system, nearestPopulatedName: nearestName });
     }
   }
 
-  return results;
+  return { candidates, cubeIndex };
 }
 
 export function findEligibleCandidates(
   systems: StarSystem[],
   options: CandidateSearchOptions,
 ): StarSystem[] {
-  return findEligibleCandidatesWithNearest(systems, options).map((candidate) => candidate.system);
+  return findEligibleCandidatesWithNearest(systems, options).candidates.map((candidate) => candidate.system);
 }
 
 export function sortCandidates(candidates: SettlementCandidate[]): SettlementCandidate[] {

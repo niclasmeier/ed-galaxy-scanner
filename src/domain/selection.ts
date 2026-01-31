@@ -101,6 +101,41 @@ export function resolveEndpoint(
   return { status: "resolved", coords: system.coords, system };
 }
 
+interface ResolvedEndpoint {
+  coords: Coords;
+  system?: StarSystem;
+}
+
+/**
+ * Resolves an endpoint from either a name/coordinates string or falls back to default.
+ * Throws descriptive errors for resolution failures.
+ */
+function resolveEndpointOrDefault(
+  name: string | undefined,
+  index: Map<string, StarSystem[]>,
+  defaultCoords: Coords,
+  defaultOverride: string | undefined,
+  endpointLabel: string,
+): ResolvedEndpoint {
+  if (name) {
+    const result = resolveEndpoint(name, index, endpointLabel);
+    if (result.status === "not_found") {
+      throw new Error(`${endpointLabel} endpoint not found: ${name}`);
+    }
+    if (result.status === "ambiguous") {
+      throw new Error(`${endpointLabel} endpoint is ambiguous: ${name}`);
+    }
+    if (result.status === "invalid_coords") {
+      throw new Error(`${endpointLabel} endpoint has invalid coordinates: ${name}`);
+    }
+    return { coords: result.coords!, system: result.system };
+  }
+  const coords = defaultOverride
+    ? (parseCoordinateString(defaultOverride).coords ?? defaultCoords)
+    : defaultCoords;
+  return { coords };
+}
+
 export function computeCubeBounds(from: Coords, to: Coords): SelectionBounds {
   const minX = Math.min(from.x, to.x);
   const minY = Math.min(from.y, to.y);
@@ -255,114 +290,56 @@ export function applySpaceSelection(
   const index = buildNameIndex(systems);
 
   if (strategy.mode === "cube") {
-    // Use constants if no endpoints provided, otherwise resolve from input
-    let cubeFromCoords: Coords;
-    let cubeToCoords: Coords;
-    let cubeFromSystem: StarSystem | undefined;
-    let cubeToSystem: StarSystem | undefined;
+    const cubeFrom = resolveEndpointOrDefault(
+      strategy.cubeFromName,
+      index,
+      SOL_COORDS,
+      options.cubeFromDefault,
+      "Cube",
+    );
+    const cubeTo = resolveEndpointOrDefault(
+      strategy.cubeToName,
+      index,
+      COLONIA_COORDS,
+      options.cubeToDefault,
+      "Cube",
+    );
 
-    if (strategy.cubeFromName) {
-      const fromResult = resolveEndpoint(strategy.cubeFromName, index, "cube-from");
-      if (fromResult.status === "not_found") {
-        throw new Error(`Cube endpoint not found: ${strategy.cubeFromName}`);
-      }
-      if (fromResult.status === "ambiguous") {
-        throw new Error(`Cube endpoint is ambiguous: ${strategy.cubeFromName}`);
-      }
-      if (fromResult.status === "invalid_coords") {
-        throw new Error(`Cube endpoint has invalid coordinates: ${strategy.cubeFromName}`);
-      }
-      cubeFromCoords = fromResult.coords!;
-      cubeFromSystem = fromResult.system;
-    } else {
-      cubeFromCoords = options.cubeFromDefault ? 
-        (parseCoordinateString(options.cubeFromDefault).coords ?? SOL_COORDS) : 
-        SOL_COORDS;
-    }
-
-    if (strategy.cubeToName) {
-      const toResult = resolveEndpoint(strategy.cubeToName, index, "cube-to");
-      if (toResult.status === "not_found") {
-        throw new Error(`Cube endpoint not found: ${strategy.cubeToName}`);
-      }
-      if (toResult.status === "ambiguous") {
-        throw new Error(`Cube endpoint is ambiguous: ${strategy.cubeToName}`);
-      }
-      if (toResult.status === "invalid_coords") {
-        throw new Error(`Cube endpoint has invalid coordinates: ${strategy.cubeToName}`);
-      }
-      cubeToCoords = toResult.coords!;
-      cubeToSystem = toResult.system;
-    } else {
-      cubeToCoords = options.cubeToDefault ? 
-        (parseCoordinateString(options.cubeToDefault).coords ?? COLONIA_COORDS) : 
-        COLONIA_COORDS;
-    }
-
-    const bounds = computeCubeBounds(cubeFromCoords, cubeToCoords);
+    const bounds = computeCubeBounds(cubeFrom.coords, cubeTo.coords);
     const { systems: selected, skippedMissingCoords } = filterSystemsByBounds(systems, bounds);
     return {
       systems: selected,
       skippedMissingCoords,
       bounds,
-      cubeFrom: cubeFromSystem,
-      cubeTo: cubeToSystem,
+      cubeFrom: cubeFrom.system,
+      cubeTo: cubeTo.system,
     };
   }
 
   if (strategy.mode === "area") {
-    // Use constants if no endpoints provided, otherwise resolve from input
-    let areaFromCoords: Coords;
-    let areaToCoords: Coords;
-    let areaFromSystem: StarSystem | undefined;
-    let areaToSystem: StarSystem | undefined;
+    const areaFrom = resolveEndpointOrDefault(
+      strategy.areaFromName,
+      index,
+      SOL_COORDS,
+      options.areaFromDefault,
+      "Area",
+    );
+    const areaTo = resolveEndpointOrDefault(
+      strategy.areaToName,
+      index,
+      COLONIA_COORDS,
+      options.areaToDefault,
+      "Area",
+    );
 
-    if (strategy.areaFromName) {
-      const fromResult = resolveEndpoint(strategy.areaFromName, index, "area-from");
-      if (fromResult.status === "not_found") {
-        throw new Error(`Area endpoint not found: ${strategy.areaFromName}`);
-      }
-      if (fromResult.status === "ambiguous") {
-        throw new Error(`Area endpoint is ambiguous: ${strategy.areaFromName}`);
-      }
-      if (fromResult.status === "invalid_coords") {
-        throw new Error(`Area endpoint has invalid coordinates: ${strategy.areaFromName}`);
-      }
-      areaFromCoords = fromResult.coords!;
-      areaFromSystem = fromResult.system;
-    } else {
-      areaFromCoords = options.areaFromDefault ? 
-        (parseCoordinateString(options.areaFromDefault).coords ?? SOL_COORDS) : 
-        SOL_COORDS;
-    }
-
-    if (strategy.areaToName) {
-      const toResult = resolveEndpoint(strategy.areaToName, index, "area-to");
-      if (toResult.status === "not_found") {
-        throw new Error(`Area endpoint not found: ${strategy.areaToName}`);
-      }
-      if (toResult.status === "ambiguous") {
-        throw new Error(`Area endpoint is ambiguous: ${strategy.areaToName}`);
-      }
-      if (toResult.status === "invalid_coords") {
-        throw new Error(`Area endpoint has invalid coordinates: ${strategy.areaToName}`);
-      }
-      areaToCoords = toResult.coords!;
-      areaToSystem = toResult.system;
-    } else {
-      areaToCoords = options.areaToDefault ? 
-        (parseCoordinateString(options.areaToDefault).coords ?? COLONIA_COORDS) : 
-        COLONIA_COORDS;
-    }
-
-    const bounds = computeAreaBounds(areaFromCoords, areaToCoords);
+    const bounds = computeAreaBounds(areaFrom.coords, areaTo.coords);
     const { systems: selected, skippedMissingCoords } = filterSystemsByArea(systems, bounds);
     return {
       systems: selected,
       skippedMissingCoords,
       bounds,
-      areaFrom: areaFromSystem,
-      areaTo: areaToSystem,
+      areaFrom: areaFrom.system,
+      areaTo: areaTo.system,
     };
   }
 

@@ -22,22 +22,24 @@ export function formatCandidates(
     return "No settlement candidates found.";
   }
 
+  if (format === "simple") {
+    const lines: string[] = [];
+    const header =
+      "| name | nearest | dsol | score | stars | bodies | icy rings | stations |";
+    const separator =
+      "| --- | --- | --- | --- | --- | --- | --- | --- |";
+    lines.push(header, separator);
+    for (const row of candidates) {
+      lines.push(
+        `| ${row.name} | ${row.nearestPopulatedName} | ${row.distanceToSol.toFixed(2)} | ${row.totalScore} | ` +
+          `${row.starsCount ?? 0} | ${row.bodyCount ?? 0} | ${row.icyRings ?? 0} | ${row.stationCount ?? 0} |`,
+      );
+    }
+    return lines.join("\n");
+  }
+
   const lines: string[] = [];
   for (const candidate of candidates) {
-    if (format === "simple") {
-      const header =
-        "| name | nearest | dsol | score | stars | bodies | icy rings | stations |";
-      const separator =
-        "| --- | --- | --- | --- | --- | --- | --- | --- |";
-      lines.push(header, separator);
-      for (const row of candidates) {
-        lines.push(
-          `| ${row.name} | ${row.nearestPopulatedName} | ${row.distanceToSol.toFixed(2)} | ${row.totalScore} | ` +
-            `${row.starsCount ?? 0} | ${row.bodyCount ?? 0} | ${row.icyRings ?? 0} | ${row.stationCount ?? 0} |`,
-        );
-      }
-      break;
-    }
     const breakdown = candidate.scoreBreakdown;
     lines.push(
       `${candidate.name} | nearest=${candidate.nearestPopulatedName} | score=${candidate.totalScore} | dist=${candidate.distanceToSol.toFixed(2)} LY`,

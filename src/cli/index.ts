@@ -1,11 +1,7 @@
 #!/usr/bin/env bun
 
 import { Command } from "commander";
-import {
-  buildCubeIndex,
-  findEligibleCandidatesWithNearest,
-  sortCandidates,
-} from "../domain/settlement.js";
+import { findEligibleCandidatesWithNearest } from "../domain/settlement.js";
 import { computeScore, shouldIncludeTritium, countIcyRings } from "../domain/scoring.js";
 import { parseSortSpec, validateSortSpec, applySortSpec, DEFAULT_SORT_SPEC } from "../domain/sorting.js";
 import { applySpaceSelection } from "../domain/selection.js";
@@ -147,6 +143,55 @@ function formatCount(value: number): string {
   return value.toLocaleString("en-US");
 }
 
+interface ProcessRecordsContext {
+  stats: ReadStats;
+  quadrants?: Set<QuadrantName>;
+  scoringStrategy?: ScoringStrategyName;
+  continueOnError: boolean;
+  writeLiveStats: () => void;
+  reportRead: () => void;
+  errorPrefix: string;
+}
+
+import type { ParsedRecord } from "../domain/types.js";
+
+async function processRecords(
+  records: AsyncIterable<ParsedRecord<StarSystem>>,
+  ctx: ProcessRecordsContext,
+): Promise<StarSystem[]> {
+  const systems: StarSystem[] = [];
+  for await (const record of records) {
+    ctx.reportRead();
+    const normalized = normalizeSystem(record.value);
+    if (normalized) {
+      if (ctx.quadrants && !isSystemInQuadrants(normalized.coords, ctx.quadrants)) {
+        ctx.stats.skippedQuadrants += 1;
+        ctx.writeLiveStats();
+        continue;
+      }
+      if (ctx.scoringStrategy === "tritium" && !shouldIncludeTritium(normalized)) {
+        ctx.stats.filteredNoIce += 1;
+        ctx.writeLiveStats();
+        continue;
+      }
+      if (normalized.population > 0) {
+        ctx.stats.populatedCount += 1;
+      } else {
+        ctx.stats.emptyCount += 1;
+      }
+      ctx.writeLiveStats();
+      systems.push(stripFleetCarriers(normalized));
+    } else if (!ctx.continueOnError) {
+      throw new Error(`Invalid system record ${ctx.errorPrefix} ${record.lineNumber ?? 0}`);
+    } else {
+      ctx.stats.brokenLines += 1;
+      ctx.writeLiveStats();
+      console.error(`Warning: invalid system record ${ctx.errorPrefix} ${record.lineNumber ?? 0}, skipping.`);
+    }
+  }
+  return systems;
+}
+
 async function readSystems(
   input: string,
   continueOnError: boolean,
@@ -181,7 +226,7 @@ async function readSystems(
     stats.readCount += 1;
     writeLiveStats();
   };
-  const onInvalid = (index: number): void => {
+  const onInvalid = (): void => {
     stats.brokenLines += 1;
     reportRead();
   };
@@ -189,38 +234,22 @@ async function readSystems(
   if (verbose) {
     writeLiveStats();
   }
+
+  const ctx: ProcessRecordsContext = {
+    stats,
+    quadrants,
+    scoringStrategy,
+    continueOnError,
+    writeLiveStats,
+    reportRead,
+    errorPrefix: "on line",
+  };
+
   if (input === "-") {
-    const systems: StarSystem[] = [];
-    for await (const record of readJsonLines<StarSystem>(input, { continueOnError, onInvalid })) {
-      reportRead();
-      const normalized = normalizeSystem(record.value);
-      if (normalized) {
-        if (quadrants && !isSystemInQuadrants(normalized.coords, quadrants)) {
-          stats.skippedQuadrants += 1;
-          writeLiveStats();
-          continue;
-        }
-        // Apply tritium filtering during read phase for memory efficiency
-        if (scoringStrategy === "tritium" && !shouldIncludeTritium(normalized)) {
-          stats.filteredNoIce += 1;
-          writeLiveStats();
-          continue;
-        }
-        if (normalized.population > 0) {
-          stats.populatedCount += 1;
-        } else {
-          stats.emptyCount += 1;
-        }
-        writeLiveStats();
-        systems.push(stripFleetCarriers(normalized));
-      } else if (!continueOnError) {
-        throw new Error(`Invalid system record on line ${record.lineNumber ?? 0}`);
-      } else {
-        stats.brokenLines += 1;
-        writeLiveStats();
-        console.error(`Warning: invalid system record on line ${record.lineNumber ?? 0}, skipping.`);
-      }
-    }
+    const systems = await processRecords(
+      readJsonLines<StarSystem>(input, { continueOnError, onInvalid }),
+      ctx,
+    );
     return { systems, stats };
   }
 
@@ -228,75 +257,21 @@ async function readSystems(
   if (!(await file.exists())) {
     throw new Error(`Input file not found: ${input}`);
   }
+
   const isArray = await detectJsonArrayInput(input);
   if (isArray) {
-    const systems: StarSystem[] = [];
-    for await (const record of readJsonArrayStream<StarSystem>(input, { continueOnError, onInvalid })) {
-      reportRead();
-      const normalized = normalizeSystem(record.value);
-      if (normalized) {
-        if (quadrants && !isSystemInQuadrants(normalized.coords, quadrants)) {
-          stats.skippedQuadrants += 1;
-          writeLiveStats();
-          continue;
-        }
-        // Apply tritium filtering during read phase for memory efficiency
-        if (scoringStrategy === "tritium" && !shouldIncludeTritium(normalized)) {
-          stats.filteredNoIce += 1;
-          writeLiveStats();
-          continue;
-        }
-        if (normalized.population > 0) {
-          stats.populatedCount += 1;
-        } else {
-          stats.emptyCount += 1;
-        }
-        writeLiveStats();
-        systems.push(stripFleetCarriers(normalized));
-      } else if (!continueOnError) {
-        throw new Error(`Invalid system record in JSON array at index ${record.lineNumber ?? 0}`);
-      } else {
-        stats.brokenLines += 1;
-        writeLiveStats();
-        console.error(
-          `Warning: invalid system record in JSON array at index ${record.lineNumber ?? 0}, skipping.`,
-        );
-      }
-    }
+    ctx.errorPrefix = "in JSON array at index";
+    const systems = await processRecords(
+      readJsonArrayStream<StarSystem>(input, { continueOnError, onInvalid }),
+      ctx,
+    );
     return { systems, stats };
   }
 
-  const systems: StarSystem[] = [];
-  for await (const record of readJsonLines<StarSystem>(input, { continueOnError, onInvalid })) {
-    reportRead();
-    const normalized = normalizeSystem(record.value);
-    if (normalized) {
-      if (quadrants && !isSystemInQuadrants(normalized.coords, quadrants)) {
-        stats.skippedQuadrants += 1;
-        writeLiveStats();
-        continue;
-      }
-      // Apply tritium filtering during read phase for memory efficiency
-      if (scoringStrategy === "tritium" && !shouldIncludeTritium(normalized)) {
-        stats.filteredNoIce += 1;
-        writeLiveStats();
-        continue;
-      }
-      if (normalized.population > 0) {
-        stats.populatedCount += 1;
-      } else {
-        stats.emptyCount += 1;
-      }
-      writeLiveStats();
-      systems.push(stripFleetCarriers(normalized));
-    } else if (!continueOnError) {
-      throw new Error(`Invalid system record on line ${record.lineNumber ?? 0}`);
-    } else {
-      stats.brokenLines += 1;
-      writeLiveStats();
-      console.error(`Warning: invalid system record on line ${record.lineNumber ?? 0}, skipping.`);
-    }
-  }
+  const systems = await processRecords(
+    readJsonLines<StarSystem>(input, { continueOnError, onInvalid }),
+    ctx,
+  );
   return { systems, stats };
 }
 
@@ -373,7 +348,7 @@ async function main(): Promise<void> {
       throw new Error(`Invalid sort specification: ${error instanceof Error ? error.message : String(error)}`);
     }
 
-    const { systems, stats } = await readSystems(input, Boolean(options.continueOnError), verbose, quadrants);
+    const { systems, stats } = await readSystems(input, Boolean(options.continueOnError), verbose, quadrants, scoringStrategy);
     let sol = systems.find((system) => system.name === "Sol");
     if (!sol) {
       sol = {coords: {x: 0.0, y: 0.0, z: 0.0}, id64: 10477373803, name: "Sol", population: 18320926115, bodies: []};
@@ -393,13 +368,14 @@ async function main(): Promise<void> {
 
     const emptyCount = scopedSystems.filter((system) => system.population <= 0).length;
     const populatedCount = scopedSystems.length - emptyCount;
-    const quadrantCount = buildCubeIndex(scopedSystems).cubes.size;
 
-    const eligible = findEligibleCandidatesWithNearest(scopedSystems, {
+    const { candidates: eligible, cubeIndex } = findEligibleCandidatesWithNearest(scopedSystems, {
       maxDistSol: selectionStrategyMode === "sphere" ? maxDistSol : undefined,
       solName: "Sol",
       sol,
     });
+    const quadrantCount = cubeIndex.cubes.size;
+
     const candidates = eligible.map(({ system, nearestPopulatedName }) => {
       const score = computeScore(system, scoringStrategy);
       const bodies = system.bodies ?? [];
