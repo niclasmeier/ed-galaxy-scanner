@@ -9,6 +9,14 @@
 
 [Extract from feature spec: primary requirement + technical approach from research]
 
+Define colonization eligibility modes with flags: default single-pass (within
+15 LY of populated systems) via `--colonization-mode single-pass`, optional
+bypass mode via `--colonization-mode none`, and an optional "route-from-Sol"
+constraint via `--require-sol-route` that requires reachability via 15 LY hops.
+
+Tune spatial indexing to the 15 LY eligibility radius (bucket size = 15 LY)
+and ensure deterministic nearest-populated tracking with candidate deduplication.
+
 Add transparent support for gzip-compressed input when the provided file name
 ends with `.gz`, using the same JSONL/JSON array parsing rules as uncompressed
 files.

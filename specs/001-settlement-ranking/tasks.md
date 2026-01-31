@@ -137,6 +137,25 @@ description: "Task list for Settlement Candidate Ranking CLI"
 
 ---
 
+## Phase 7: Colonization Modes & Route Constraint (Future)
+
+**Goal**: Support optional colonization bypass and Sol-reachability constraints while
+maintaining deterministic outputs and performance bounds.
+
+### Tests
+
+- [ ] T048 [P] Add unit tests for reachability from Sol (15 LY hop graph)
+- [ ] T049 [P] Add unit tests for candidate deduplication and nearest-populated tracking
+- [ ] T050 [P] Add integration tests for "no colonization check" mode
+- [ ] T051 [P] Add integration tests for "route-from-Sol" constraint (exclude Colonia)
+
+### Implementation
+
+- [ ] T052 Add CLI flags `--colonization-mode` (single-pass|none) and `--require-sol-route`
+- [ ] T053 Update settlement candidate search to use 15 LY bucket sizing
+- [ ] T054 Implement reachability filter (BFS/DFS from Sol via 15 LY hops)
+- [ ] T055 Track nearest populated system and deduplicate candidates deterministically
+
 ## Dependencies & Execution Order
 
 - Phase 1 → Phase 2 → User stories in priority order (P1 → P2 → P3) → Polish

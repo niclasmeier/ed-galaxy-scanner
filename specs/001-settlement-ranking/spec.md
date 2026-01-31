@@ -160,6 +160,14 @@ the breakdown matches the scoring rules.
 - **FR-007**: The system MUST consider candidate systems that are within
   $\le 15\,\text{LY}$ of previously settled systems, where "previously settled"
   means only the initially populated systems (single-pass, no iterative expansion).
+- **FR-007a**: The system MUST support a mode that bypasses the colonization
+  eligibility check (no $\le 15\,\text{LY}$ requirement) and returns scored systems
+  after basic filters (quadrants, max-distance-to-Sol, planet presence). This MUST
+  be enabled via `--colonization-mode none` (default: `--colonization-mode standard`).
+- **FR-007b**: When enabled, the system MUST require that eligible systems are
+  reachable from Sol via a chain of systems where each hop is $\le 15\,\text{LY}$.
+  This route constraint MUST be applied before returning candidates and MUST be
+  enabled via `--require-sol-route`.
 - **FR-008**: The system MUST define "suitable for settlement" as any empty
   system with at least one planet.
 - **FR-009**: The system MUST output results ordered by total score descending and
@@ -190,7 +198,15 @@ the breakdown matches the scoring rules.
 - **FR-011**: The system MUST filter systems beyond the max-distance-to-Sol threshold before indexing.
 - **FR-012**: The system MUST partition systems into populated and empty lists before spatial indexing.
 - **FR-013**: The system MUST index systems into 50 LY cubes (on-demand creation) and maintain a list of cubes containing at least one system, with a flag indicating whether the cube contains any populated systems.
-- **FR-014**: The system MUST iterate populated cubes and compare populated systems against empty systems in the current cube plus 26 adjacent cubes when evaluating 15 LY eligibility.
+- **FR-013**: The system MUST index systems into spatial buckets sized to the
+  eligibility radius (default 15 LY) and maintain a list of buckets containing at
+  least one system, with a flag indicating whether the bucket contains any populated systems.
+- **FR-014**: The system MUST iterate populated buckets and compare populated systems
+  against empty systems in the current bucket plus 26 adjacent buckets when evaluating
+  15 LY eligibility.
+- **FR-014a**: The system MUST deduplicate candidates and store the nearest populated
+  system name and distance for deterministic output when multiple populated systems
+  are within range.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -214,12 +230,18 @@ the breakdown matches the scoring rules.
 1. Read systems from input.
 2. Filter out systems beyond the max-distance-to-Sol threshold.
 3. Split systems into populated (population $> 0$) and empty (population $\le 0$).
-4. Index systems into 50 LY quadrants (created on demand). Maintain a list of quadrants that contain at least one system and mark quadrants that contain any populated system.
-5. For each quadrant with populated systems:
-  - Build the candidate empty list from that quadrant plus its 26 adjacent quadrants.
-  - For each populated system in the current quadrant, measure distance to candidate empties.
-  - If distance $\le 15$ LY, compute the system score and add to results.
-6. After all cubes are processed, sort results by score (desc) then name (asc) and return.
+4. If `--require-sol-route` is enabled, build a reachability set from Sol using hops of
+  $\le 15$ LY (grid/KD-tree neighbor lookup) and discard systems not reachable.
+5. If `--colonization-mode none` is enabled, score eligible systems directly (empty
+  systems with at least one planet) and skip steps 6–7.
+6. Index systems into radius-sized buckets (created on demand). Maintain a list of
+  buckets that contain at least one system and mark buckets that contain any populated system.
+7. For each bucket with populated systems:
+  - Build the candidate empty list from that bucket plus its 26 adjacent buckets.
+  - For each populated system in the current bucket, measure distance to candidate empties.
+  - If distance $\le 15$ LY, compute score, track nearest populated system, and
+   deduplicate candidates deterministically.
+8. After all buckets are processed, sort results by score (desc) then name (asc) and return.
 
 ## Success Criteria *(mandatory)*
 
